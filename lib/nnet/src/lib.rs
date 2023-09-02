@@ -9,10 +9,12 @@
 
 pub mod activation;
 pub mod layer;
+pub mod network;
 pub mod neuron;
 
 pub use crate::{
-    activation::{ActivationFunction, DynActivationFunction},
+    activation::{Activate, Function as ActivationFunction},
     layer::Layer,
-    neuron::{BasicNeuron, Neuron},
+    network::Network,
+    neuron::{Activate as NeuronActivate, Basic as BasicNeuron, Neuron},
 };

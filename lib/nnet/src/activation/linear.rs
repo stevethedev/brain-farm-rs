@@ -1,10 +1,28 @@
-use super::ActivationFunction;
+use super::{Activate, Function};
 
+/// Linear activation function.
+#[derive(Debug, PartialEq)]
 pub struct Linear;
 
-impl ActivationFunction for Linear {
-    fn activate(&self, x: f64) -> f64 {
-        x
+impl Activate for Linear {
+    fn activate(&self, input: f64) -> f64 {
+        input
+    }
+}
+
+impl Function {
+    /// Linear activation function.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::ActivationFunction;
+    ///
+    /// let lin = ActivationFunction::linear();
+    /// ```
+    #[must_use]
+    pub fn linear() -> Self {
+        Self::Linear(Linear)
     }
 }
 
@@ -20,9 +38,7 @@ mod tests {
         let outputs = lin.activate(0.1 * 0.1 + 0.5 * 0.2 + 1.0 * 0.3 + 1.5 * 0.4 + 1.0);
         assert!(
             (outputs - expected).abs() < f64::EPSILON,
-            "Expected {} to be close to {}",
-            outputs,
-            expected
+            "Expected {outputs} to be close to {expected}"
         );
     }
 }

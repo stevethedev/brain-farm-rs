@@ -1,7 +1,7 @@
-use super::Neuron;
-use crate::{ActivationFunction, DynActivationFunction};
+use crate::{Activate, ActivationFunction, Neuron, NeuronActivate};
 
 /// A basic neuron.
+#[derive(Debug, PartialEq)]
 pub struct Basic {
     /// Shifts the neuron's overall sensitivity.
     bias: f64,
@@ -10,7 +10,7 @@ pub struct Basic {
     weights: Vec<f64>,
 
     /// The activation function to use.
-    activation: DynActivationFunction,
+    activation: ActivationFunction,
 }
 
 impl Basic {
@@ -23,20 +23,34 @@ impl Basic {
     /// # Examples
     ///
     /// ```
-    /// use nnet::{BasicNeuron, ActivationFunction};
+    /// use nnet::{Neuron, BasicNeuron, ActivationFunction};
     ///
     /// let neuron = BasicNeuron::builder()
     ///  .bias(0.0)
     ///  .weights(vec![0.1, 0.2, 0.3, 0.4])
-    ///  .activation(ActivationFunction::Linear)
+    ///  .activation(ActivationFunction::linear())
     ///  .build();
     /// ```
+    #[must_use]
     pub fn builder() -> Builder {
         Builder::default()
     }
 }
 
-impl Neuron for Basic {
+impl Neuron {
+    #[must_use]
+    pub fn basic() -> Builder {
+        Builder::default()
+    }
+}
+
+impl From<Basic> for Neuron {
+    fn from(basic: Basic) -> Neuron {
+        Neuron::Basic(basic)
+    }
+}
+
+impl NeuronActivate for Basic {
     fn activate(&self, inputs: &[f64]) -> f64 {
         let sum = sum(&self.weights, inputs, self.bias);
         self.activation.activate(sum)
@@ -72,14 +86,14 @@ fn sum(weights: &[f64], inputs: &[f64], bias: f64) -> f64 {
 /// let neuron = BasicNeuron::builder()
 ///    .bias(0.0)
 ///   .weights(vec![0.1, 0.2, 0.3, 0.4])
-///   .activation(ActivationFunction::Linear)
+///   .activation(ActivationFunction::linear())
 ///  .build();
 /// ```
 #[derive(Default)]
 pub struct Builder {
     bias: Option<f64>,
     weights: Option<Vec<f64>>,
-    activation: Option<DynActivationFunction>,
+    activation: Option<ActivationFunction>,
 }
 
 impl Builder {
@@ -101,9 +115,10 @@ impl Builder {
     /// let neuron = BasicNeuron::builder()
     ///   .bias(0.0)
     ///   .weights(vec![0.1, 0.2, 0.3, 0.4])
-    ///   .activation(ActivationFunction::Linear)
+    ///   .activation(ActivationFunction::linear())
     ///   .build();
     /// ```
+    #[must_use]
     pub fn bias(mut self, bias: f64) -> Self {
         self.bias = Some(bias);
         self
@@ -127,9 +142,10 @@ impl Builder {
     /// let neuron = BasicNeuron::builder()
     ///  .bias(0.0)
     ///  .weights(vec![0.1, 0.2, 0.3, 0.4])
-    ///  .activation(ActivationFunction::Linear)
+    ///  .activation(ActivationFunction::linear())
     ///  .build();
     /// ```
+    #[must_use]
     pub fn weights(mut self, weights: Vec<f64>) -> Self {
         self.weights = Some(weights);
         self
@@ -153,11 +169,12 @@ impl Builder {
     /// let neuron = BasicNeuron::builder()
     ///   .bias(0.0)
     ///   .weights(vec![0.1, 0.2, 0.3, 0.4])
-    ///   .activation(ActivationFunction::Linear)
+    ///   .activation(ActivationFunction::linear())
     ///   .build();
     /// ```
-    pub fn activation<F: ActivationFunction + 'static>(mut self, activation: F) -> Self {
-        self.activation = Some(Box::new(activation));
+    #[must_use]
+    pub fn activation(mut self, activation: ActivationFunction) -> Self {
+        self.activation = Some(activation);
         self
     }
 
@@ -175,16 +192,14 @@ impl Builder {
     /// let neuron = BasicNeuron::builder()
     ///   .bias(0.0)
     ///   .weights(vec![0.1, 0.2, 0.3, 0.4])
-    ///   .activation(ActivationFunction::Linear)
+    ///   .activation(ActivationFunction::linear())
     ///   .build();
     /// ```
     pub fn build(self) -> Basic {
         Basic {
             bias: self.bias.unwrap_or(0.0),
             weights: self.weights.unwrap_or_default(),
-            activation: self
-                .activation
-                .unwrap_or_else(|| Box::new(crate::activation::Sigmoid)),
+            activation: self.activation.unwrap_or_else(ActivationFunction::sigmoid),
         }
     }
 }
@@ -198,7 +213,7 @@ mod tests {
         let neuron = Builder::default()
             .bias(0.0)
             .weights(vec![0.1, 0.2, 0.3, 0.4])
-            .activation(crate::activation::Linear)
+            .activation(ActivationFunction::linear())
             .build();
 
         let inputs = [0.1, 0.2, 0.3, 0.4];
@@ -206,9 +221,7 @@ mod tests {
         let output = neuron.activate(&inputs);
         assert!(
             (output - expected).abs() < f64::EPSILON,
-            "Expected {} to be close to {}",
-            output,
-            expected
+            "Expected {output} to be close to {expected}",
         );
     }
 }
