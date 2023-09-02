@@ -1,3 +1,7 @@
+mod sigmoid;
+
+pub use sigmoid::Sigmoid;
+
 /// Neuron activation function
 ///
 /// This trait is implemented by the various activation functions that can be used by neurons.
