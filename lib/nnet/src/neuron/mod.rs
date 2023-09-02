@@ -1,5 +1,7 @@
 mod basic;
 
+pub use basic::{Basic as BasicNeuron, Builder as BasicNeuronBuilder};
+
 /// Neuron trait
 ///
 /// This trait is implemented by the various types of neurons that can be used by networks.

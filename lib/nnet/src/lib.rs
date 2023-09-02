@@ -8,7 +8,9 @@
 )]
 
 mod activation;
+mod layer;
 mod neuron;
 
 pub use activation::*;
+pub use layer::*;
 pub use neuron::*;
