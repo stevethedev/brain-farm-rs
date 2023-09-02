@@ -1,3 +1,5 @@
+mod basic;
+
 /// Neuron trait
 ///
 /// This trait is implemented by the various types of neurons that can be used by networks.

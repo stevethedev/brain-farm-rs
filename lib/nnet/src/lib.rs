@@ -9,3 +9,6 @@
 
 mod activation;
 mod neuron;
+
+pub use activation::*;
+pub use neuron::*;

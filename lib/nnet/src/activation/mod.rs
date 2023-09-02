@@ -1,6 +1,10 @@
+mod linear;
 mod sigmoid;
 
+pub use linear::Linear;
 pub use sigmoid::Sigmoid;
+
+pub type DynActivationFunction = Box<dyn ActivationFunction>;
 
 /// Neuron activation function
 ///

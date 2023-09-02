@@ -1,9 +1,11 @@
+use super::ActivationFunction;
+
 /// Sigmoid activation function
 ///
 /// This function is used to squash the output of a neuron to a value between 0 and 1.
 pub struct Sigmoid;
 
-impl super::ActivationFunction for Sigmoid {
+impl ActivationFunction for Sigmoid {
     fn activate(&self, x: f64) -> f64 {
         let n_exp = (-x).exp();
         1.0 / (1.0 + n_exp)
@@ -20,8 +22,8 @@ mod tests {
             / (1.0
                 + std::f64::consts::E.powf(-(0.1 * 0.1 + 0.5 * 0.2 + 1.0 * 0.3 + 1.5 * 0.4 + 1.0)));
 
-        let sig = ActivationFunction::Sigmoid;
-        let outputs = sig.run(&[0.1, 0.5, 1.0, 1.5], &[0.1, 0.2, 0.3, 0.4], 1.0);
+        let sig = Sigmoid;
+        let outputs = sig.activate(0.1 * 0.1 + 0.5 * 0.2 + 1.0 * 0.3 + 1.5 * 0.4 + 1.0);
         assert!(
             (outputs - expected).abs() < f64::EPSILON,
             "Expected {} to be close to {}",
