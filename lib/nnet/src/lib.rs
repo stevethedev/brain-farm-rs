@@ -7,10 +7,12 @@
     clippy::pedantic
 )]
 
-mod activation;
-mod layer;
-mod neuron;
+pub mod activation;
+pub mod layer;
+pub mod neuron;
 
-pub use activation::*;
-pub use layer::*;
-pub use neuron::*;
+pub use crate::{
+    activation::{ActivationFunction, DynActivationFunction},
+    layer::Layer,
+    neuron::{BasicNeuron, Neuron},
+};
