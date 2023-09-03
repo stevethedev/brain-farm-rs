@@ -1,5 +1,3 @@
-pub type Generation<TGenome> = Vec<TGenome>;
-
 /// Stock a generation with genomes.
 ///
 /// # Examples
@@ -39,7 +37,7 @@ pub trait Stock<TGenome> {
 
     fn generate(&self, base: &TGenome) -> TGenome;
 
-    fn stock(&self, generation_size: usize) -> Generation<TGenome> {
+    fn stock(&self, generation_size: usize) -> super::Generation<TGenome> {
         let base = self.base_genome();
         let mut output = vec![];
         let iter = std::iter::repeat_with(|| self.generate(&base));
