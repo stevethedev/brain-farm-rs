@@ -1,4 +1,5 @@
 use crate::Layer;
+use serde::{Deserialize, Serialize};
 
 /// A neural network.
 ///
@@ -16,7 +17,7 @@ use crate::Layer;
 ///
 /// assert_eq!(outputs.len(), 1);
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Network {
     layers: Vec<Layer>,
 }
@@ -92,6 +93,68 @@ impl Network {
     pub fn layers(&self) -> &[Layer] {
         &self.layers
     }
+
+    /// Parse a JSON string into a network.
+    ///
+    /// # Arguments
+    ///
+    /// - `json` is the JSON string to parse.
+    ///
+    /// # Returns
+    ///
+    /// The parsed network.
+    ///
+    /// # Errors
+    ///
+    /// If the network cannot be parsed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Network, Layer, BasicNeuron};
+    ///
+    /// let neuron = BasicNeuron::builder().build();
+    /// let layer = Layer::builder().add_neuron(neuron).build();
+    /// let network = Network::builder().add_layer(layer).build();
+    ///
+    /// let serialized = serde_json::to_string(&network).unwrap();
+    ///
+    /// let parsed = Network::parse_json(&serialized).unwrap();
+    ///
+    /// assert_eq!(network, parsed);
+    /// ```
+    pub fn parse_json(json: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(json)
+    }
+
+    /// Serialize the network to a JSON string.
+    ///
+    /// # Returns
+    ///
+    /// The serialized network.
+    ///
+    /// # Errors
+    ///
+    /// If the network cannot be serialized.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Network, Layer, BasicNeuron};
+    ///
+    /// let neuron = BasicNeuron::builder().build();
+    /// let layer = Layer::builder().add_neuron(neuron).build();
+    /// let network = Network::builder().add_layer(layer).build();
+    ///
+    /// let serialized = network.to_json().unwrap();
+    ///
+    /// let parsed = Network::parse_json(&serialized).unwrap();
+    ///
+    /// assert_eq!(network, parsed);
+    /// ```
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(self)
+    }
 }
 
 /// A builder for [`Network`].
@@ -159,6 +222,7 @@ impl Builder {
     ///
     /// assert_eq!(network.layers().len(), 1);
     /// ```
+    #[must_use]
     pub fn add_layers(mut self, layers: Vec<Layer>) -> Self {
         self.layers.extend(layers);
         self

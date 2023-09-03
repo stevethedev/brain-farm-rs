@@ -1,4 +1,5 @@
 use crate::{Neuron, NeuronActivate};
+use serde::{Deserialize, Serialize};
 
 /// A layer of neurons.
 ///
@@ -10,7 +11,7 @@ use crate::{Neuron, NeuronActivate};
 /// let neuron = BasicNeuron::builder().build();
 /// let layer = Layer::builder().add_neuron(neuron).build();
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Layer {
     neurons: Vec<Neuron>,
 }
@@ -132,6 +133,7 @@ impl Builder {
     ///
     /// assert_eq!(layer.neurons().len(), 1);
     /// ```
+    #[must_use]
     pub fn add_neurons(mut self, neurons: Vec<Neuron>) -> Self {
         self.neurons.extend(neurons);
         self
@@ -183,5 +185,55 @@ mod tests {
 
         let output = layer.activate(&[0.0, 0.0]);
         assert_eq!(output.len(), 2);
+    }
+
+    #[test]
+    fn test_serialize() {
+        let layer = Layer::builder()
+            .add_neuron(
+                Neuron::basic()
+                    .bias(0.0)
+                    .weights(vec![0.0, 0.0])
+                    .activation(ActivationFunction::sigmoid())
+                    .build(),
+            )
+            .add_neuron(
+                Neuron::basic()
+                    .bias(0.0)
+                    .weights(vec![0.0, 0.0])
+                    .activation(ActivationFunction::sigmoid())
+                    .build(),
+            )
+            .build();
+
+        let serialized = serde_json::to_string(&layer).unwrap();
+        let expected = r#"{"neurons":[{"Basic":{"bias":0.0,"weights":[0.0,0.0],"activation":{"Sigmoid":null}}},{"Basic":{"bias":0.0,"weights":[0.0,0.0],"activation":{"Sigmoid":null}}}]}"#;
+        assert_eq!(serialized, expected);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let layer = Layer::builder()
+            .add_neuron(
+                Neuron::basic()
+                    .bias(0.0)
+                    .weights(vec![0.0, 0.0])
+                    .activation(ActivationFunction::sigmoid())
+                    .build(),
+            )
+            .add_neuron(
+                Neuron::basic()
+                    .bias(0.0)
+                    .weights(vec![0.0, 0.0])
+                    .activation(ActivationFunction::sigmoid())
+                    .build(),
+            )
+            .build();
+
+        let deserialized: Layer = serde_json::from_str(
+            r#"{"neurons":[{"Basic":{"bias":0.0,"weights":[0.0,0.0],"activation":{"Sigmoid":null}}},{"Basic":{"bias":0.0,"weights":[0.0,0.0],"activation":{"Sigmoid":null}}}]}"#,
+        )
+        .unwrap();
+        assert_eq!(layer, deserialized);
     }
 }

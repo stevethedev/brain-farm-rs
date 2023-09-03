@@ -1,9 +1,10 @@
 use super::{Activate, Function};
+use serde::{Deserialize, Serialize};
 
 /// Sigmoid activation function
 ///
 /// This function is used to squash the output of a neuron to a value between 0 and 1.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Sigmoid;
 
 impl Activate for Sigmoid {
@@ -45,5 +46,20 @@ mod tests {
             (outputs - expected).abs() < f64::EPSILON,
             "Expected {outputs} to be close to {expected}"
         );
+    }
+
+    #[test]
+    fn test_serialize() {
+        let sig = Sigmoid;
+        let serialized = serde_json::to_string(&sig).unwrap();
+        let expected = r#"null"#;
+        assert_eq!(serialized, expected);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let sig = Sigmoid;
+        let deserialized = serde_json::from_str(r#"null"#).unwrap();
+        assert_eq!(sig, deserialized);
     }
 }

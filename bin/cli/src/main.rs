@@ -7,18 +7,47 @@
     clippy::pedantic
 )]
 
-use nnet::{Layer, Network, Neuron};
+use nnet::Network;
+
+const NETWORK_JSON: &str = r#"
+{
+    "layers": [
+        {
+            "neurons": [
+                {
+                    "Basic": {
+                        "bias": 0.0,
+                        "weights": [
+                            1.0
+                        ],
+                        "activation": {
+                            "Sigmoid": null
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "neurons": [
+                {
+                    "Basic": {
+                        "bias": 0.0,
+                        "weights": [
+                            0.5
+                        ],
+                        "activation": {
+                            "Sigmoid": null
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+"#;
 
 fn main() {
-    let layers = vec![
-        Layer::builder()
-            .add_neuron(Neuron::basic().add_weight(1.0).build())
-            .build(),
-        Layer::builder()
-            .add_neuron(Neuron::basic().add_weight(0.5).build())
-            .build(),
-    ];
-    let network = Network::builder().add_layers(layers).build();
+    let network = Network::parse_json(NETWORK_JSON).unwrap();
 
     let input = vec![1.0, 1.0];
     let output = network.activate(&input);

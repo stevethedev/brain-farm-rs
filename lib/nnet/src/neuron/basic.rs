@@ -1,7 +1,8 @@
 use crate::{Activate, ActivationFunction, Neuron, NeuronActivate};
+use serde::{Deserialize, Serialize};
 
 /// A basic neuron.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Basic {
     /// Shifts the neuron's overall sensitivity.
     bias: f64,
@@ -38,6 +39,23 @@ impl Basic {
 }
 
 impl Neuron {
+    /// Create a new basic neuron builder.
+    ///
+    /// # Returns
+    ///
+    /// The builder.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Neuron, BasicNeuron, ActivationFunction};
+    ///
+    /// let neuron = Neuron::basic()
+    ///     .bias(0.0)
+    ///     .weights(vec![0.1, 0.2, 0.3, 0.4])
+    ///     .activation(ActivationFunction::linear())
+    ///     .build();
+    /// ```
     #[must_use]
     pub fn basic() -> Builder {
         Builder::default()
@@ -172,6 +190,7 @@ impl Builder {
     ///     .activation(ActivationFunction::linear())
     ///     .build();
     /// ```
+    #[must_use]
     pub fn add_weight(mut self, weight: f64) -> Self {
         self.weights.push(weight);
         self
@@ -198,6 +217,7 @@ impl Builder {
     ///    .activation(ActivationFunction::linear())
     ///    .build();
     /// ```
+    #[must_use]
     pub fn add_weights(mut self, weight: Vec<f64>) -> Self {
         self.weights.extend(weight);
         self
@@ -275,5 +295,30 @@ mod tests {
             (output - expected).abs() < f64::EPSILON,
             "Expected {output} to be close to {expected}",
         );
+    }
+
+    #[test]
+    fn test_serialize() {
+        let neuron = Builder::default()
+            .bias(0.0)
+            .weights(vec![0.1, 0.2, 0.3, 0.4])
+            .activation(ActivationFunction::linear())
+            .build();
+
+        let serialized = serde_json::to_string(&neuron).unwrap();
+        let expected = r#"{"bias":0.0,"weights":[0.1,0.2,0.3,0.4],"activation":{"Linear":null}}"#;
+        assert_eq!(serialized, expected);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let serialized = r#"{"bias":0.0,"weights":[0.1,0.2,0.3,0.4],"activation":{"Linear":null}}"#;
+        let deserialized: Basic = serde_json::from_str(serialized).unwrap();
+        let expected = Builder::default()
+            .bias(0.0)
+            .weights(vec![0.1, 0.2, 0.3, 0.4])
+            .activation(ActivationFunction::linear())
+            .build();
+        assert_eq!(deserialized, expected);
     }
 }

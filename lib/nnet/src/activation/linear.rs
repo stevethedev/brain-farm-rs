@@ -1,7 +1,8 @@
 use super::{Activate, Function};
+use serde::{Deserialize, Serialize};
 
 /// Linear activation function.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Linear;
 
 impl Activate for Linear {
@@ -40,5 +41,20 @@ mod tests {
             (outputs - expected).abs() < f64::EPSILON,
             "Expected {outputs} to be close to {expected}"
         );
+    }
+
+    #[test]
+    fn test_serialize() {
+        let lin = Linear;
+        let serialized = serde_json::to_string(&lin).unwrap();
+        let expected = r#"null"#;
+        assert_eq!(serialized, expected);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let lin = Linear;
+        let deserialized = serde_json::from_str(r#"null"#).unwrap();
+        assert_eq!(lin, deserialized);
     }
 }
