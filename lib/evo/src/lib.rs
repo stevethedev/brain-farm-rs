@@ -8,5 +8,9 @@
 )]
 
 mod algo;
+mod fitness_calc;
 
-pub use algo::Algorithm;
+pub use self::{
+    algo::Algorithm,
+    fitness_calc::{FitnessCalc, Predict, TrainingRecord},
+};
