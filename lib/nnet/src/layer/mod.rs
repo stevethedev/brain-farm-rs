@@ -112,6 +112,31 @@ impl Builder {
         self
     }
 
+    /// Add a vector of neurons to the layer.
+    ///
+    /// # Arguments
+    ///
+    /// - `neurons` to add to the layer.
+    ///
+    /// # Returns
+    ///
+    /// The builder.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Layer, Neuron};
+    ///
+    /// let neuron = Neuron::basic().build().into();
+    /// let layer = Layer::builder().add_neurons(vec![neuron]).build();
+    ///
+    /// assert_eq!(layer.neurons().len(), 1);
+    /// ```
+    pub fn add_neurons(mut self, neurons: Vec<Neuron>) -> Self {
+        self.neurons.extend(neurons);
+        self
+    }
+
     /// Build the layer.
     ///
     /// # Returns

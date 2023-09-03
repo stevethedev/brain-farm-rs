@@ -5,6 +5,9 @@ version = 3
 [[package]]
 name = "brain-farm-cli"
 version = "0.1.0"
+dependencies = [
+ "nnet",
+]
 
 [[package]]
 name = "nnet"

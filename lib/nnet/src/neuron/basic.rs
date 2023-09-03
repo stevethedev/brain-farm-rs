@@ -91,8 +91,8 @@ fn sum(weights: &[f64], inputs: &[f64], bias: f64) -> f64 {
 /// ```
 #[derive(Default)]
 pub struct Builder {
-    bias: Option<f64>,
-    weights: Option<Vec<f64>>,
+    bias: f64,
+    weights: Vec<f64>,
     activation: Option<ActivationFunction>,
 }
 
@@ -120,7 +120,7 @@ impl Builder {
     /// ```
     #[must_use]
     pub fn bias(mut self, bias: f64) -> Self {
-        self.bias = Some(bias);
+        self.bias = bias;
         self
     }
 
@@ -147,7 +147,59 @@ impl Builder {
     /// ```
     #[must_use]
     pub fn weights(mut self, weights: Vec<f64>) -> Self {
-        self.weights = Some(weights);
+        self.weights = weights;
+        self
+    }
+
+    /// Add a weight for the neuron.
+    ///
+    /// # Arguments
+    ///
+    /// - `weight` is multiplied against each of the input values.
+    ///
+    /// # Returns
+    ///
+    /// The builder.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{BasicNeuron, ActivationFunction};
+    ///
+    /// let neuron = BasicNeuron::builder()
+    ///     .bias(0.0)
+    ///     .weights(vec![0.1, 0.2, 0.3, 0.4])
+    ///     .activation(ActivationFunction::linear())
+    ///     .build();
+    /// ```
+    pub fn add_weight(mut self, weight: f64) -> Self {
+        self.weights.push(weight);
+        self
+    }
+
+    /// Add multiple weights for the neuron.
+    ///
+    /// # Arguments
+    ///
+    /// - `weight` is multiplied against each of the input values.
+    ///
+    /// # Returns
+    ///
+    /// The builder.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{BasicNeuron, ActivationFunction};
+    ///
+    /// let neuron = BasicNeuron::builder()
+    ///    .bias(0.0)
+    ///    .weights(vec![0.1, 0.2, 0.3, 0.4])
+    ///    .activation(ActivationFunction::linear())
+    ///    .build();
+    /// ```
+    pub fn add_weights(mut self, weight: Vec<f64>) -> Self {
+        self.weights.extend(weight);
         self
     }
 
@@ -197,8 +249,8 @@ impl Builder {
     /// ```
     pub fn build(self) -> Basic {
         Basic {
-            bias: self.bias.unwrap_or(0.0),
-            weights: self.weights.unwrap_or_default(),
+            bias: self.bias,
+            weights: self.weights,
             activation: self.activation.unwrap_or_else(ActivationFunction::sigmoid),
         }
     }
