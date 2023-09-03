@@ -12,5 +12,5 @@ mod fitness_calc;
 
 pub use self::{
     algo::Algorithm,
-    fitness_calc::{FitnessCalc, Predict, TrainingRecord},
+    fitness_calc::{Compare, CompareRecord, FitnessCalc, Predict, TrainingRecord},
 };
