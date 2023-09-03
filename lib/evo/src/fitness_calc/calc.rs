@@ -176,7 +176,7 @@ impl Calc {
     ///
     /// ```
     /// use evo::{Compare, CompareRecord, FitnessCalc, Predict, TrainingRecord};
-    /// use std::cmp::{Ordering, Ord, Eq, PartialEq};
+    /// use std::cmp::{Ordering, Eq, PartialEq};
     ///
     /// #[derive(Debug)]
     /// struct Predictor;
@@ -198,12 +198,6 @@ impl Calc {
     /// impl PartialOrd for Predictor {
     ///     fn partial_cmp(&self, _other: &Self) -> Option<Ordering> {
     ///         Some(Ordering::Equal)
-    ///     }
-    /// }
-    ///
-    /// impl Ord for Predictor {
-    ///     fn cmp(&self, _other: &Self) -> Ordering {
-    ///         Ordering::Equal
     ///     }
     /// }
     ///
@@ -233,7 +227,7 @@ impl Calc {
     /// ```
     pub fn best_entity<'x, P, C>(&self, entities: &'x [P], compare: &C) -> Result<Option<&'x P>>
     where
-        P: Predict + Ord,
+        P: Predict + PartialOrd,
         C: Compare<P>,
     {
         let vector = entities
@@ -330,7 +324,7 @@ mod tests {
 
         let actual = fitness_calc.check(&TestPredict).unwrap();
 
-        assert_eq!(actual, 0.0);
+        assert!(actual.abs() <= f64::EPSILON, "expected ~0.0, got {actual}");
     }
 
     #[test]
@@ -360,12 +354,6 @@ mod tests {
     struct Predictor(f64);
 
     impl Eq for Predictor {}
-
-    impl Ord for Predictor {
-        fn cmp(&self, other: &Self) -> Ordering {
-            self.partial_cmp(other).unwrap()
-        }
-    }
 
     impl Predict for Predictor {
         fn predict(&self, input: &[f64]) -> Vec<f64> {

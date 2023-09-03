@@ -5,7 +5,7 @@ mod predict;
 mod training;
 
 pub use self::{
-    calc::{Builder as FitnessCalcBuilder, Calc as FitnessCalc},
+    calc::{Builder, Calc as FitnessCalc},
     compare::{Compare, Record as CompareRecord},
     error::{Error, Result},
     predict::Predict,

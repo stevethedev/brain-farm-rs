@@ -60,7 +60,7 @@ use super::Predict;
 /// ```
 pub trait Compare<P>
 where
-    P: Predict + Ord,
+    P: Predict + PartialOrd,
 {
     /// Compare two entities.
     fn compare(&self, left: &Record<P>, right: &Record<P>) -> std::cmp::Ordering;
@@ -69,7 +69,7 @@ where
 /// A record for comparing entities.
 pub struct Record<'a, P>
 where
-    P: Predict + Ord,
+    P: Predict + PartialOrd,
 {
     /// The fitness of the entity.
     pub fitness: f64,
@@ -112,6 +112,13 @@ mod tests {
 
     #[test]
     fn compare() {
+        struct Comparator;
+        impl Compare<Predictor> for Comparator {
+            fn compare(&self, left: &Record<Predictor>, right: &Record<Predictor>) -> Ordering {
+                left.fitness.partial_cmp(&right.fitness).unwrap()
+            }
+        }
+
         let left = Record {
             fitness: 0.0,
             predict: &Predictor,
@@ -121,14 +128,6 @@ mod tests {
             fitness: 1.0,
             predict: &Predictor,
         };
-
-        struct Comparator;
-
-        impl Compare<Predictor> for Comparator {
-            fn compare(&self, left: &Record<Predictor>, right: &Record<Predictor>) -> Ordering {
-                left.fitness.partial_cmp(&right.fitness).unwrap()
-            }
-        }
 
         let compare = Comparator;
         let ordering = compare.compare(&left, &right);

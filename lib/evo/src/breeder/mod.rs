@@ -217,8 +217,7 @@ where
     /// ```
     pub fn breed(&self, left: &TGenome, right: &TGenome) -> TGenome {
         let offspring = self.breeder.crossover((left, right));
-        let offspring = self.breeder.mutate(offspring);
-        offspring
+        self.breeder.mutate(offspring)
     }
 }
 
