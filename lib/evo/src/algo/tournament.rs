@@ -1,4 +1,5 @@
 use crate::{CompareRecord, Predict};
+use rand::prelude::*;
 use rand::Rng;
 
 pub struct Tournament<TGenome> {
@@ -21,14 +22,8 @@ where
         &self,
         candidates: &'x [CompareRecord<TGenome>],
     ) -> Option<&'x CompareRecord<TGenome>> {
-        let candidate_count = candidates.len();
-        let tournament_size = usize::min(candidate_count, self.tournament_size);
-
         let mut winner = None;
-        for _ in 0..tournament_size {
-            let id = rand::thread_rng().gen_range(0..candidate_count);
-            let candidate = candidates.get(id)?;
-
+        for candidate in self.tournament_iter(candidates) {
             winner = Some(match winner {
                 None => candidate,
                 Some(winner) => match PartialOrd::partial_cmp(winner, candidate) {
@@ -39,6 +34,24 @@ where
         }
 
         winner
+    }
+
+    fn tournament_iter<'x>(
+        &self,
+        candidates: &'x [CompareRecord<TGenome>],
+    ) -> impl Iterator<Item = &'x CompareRecord<TGenome>> {
+        let tournament_size = self.tournament_size(candidates);
+
+        let mut indexes = (0..candidates.len()).collect::<Vec<_>>();
+        indexes.shuffle(&mut thread_rng());
+        indexes
+            .into_iter()
+            .take(tournament_size)
+            .map(move |id| &candidates[id])
+    }
+
+    pub fn tournament_size<T>(&self, candidates: &[T]) -> usize {
+        usize::min(self.tournament_size, candidates.len())
     }
 }
 
@@ -130,5 +143,29 @@ mod tests {
                 predict: Predictor { value: 3.0 },
             })
         );
+    }
+
+    #[test]
+    fn test_tournament_size() {
+        let candidates = vec![
+            CompareRecord {
+                fitness: 1.0,
+                predict: Predictor { value: 1.0 },
+            },
+            CompareRecord {
+                fitness: 3.0,
+                predict: Predictor { value: 3.0 },
+            },
+            CompareRecord {
+                fitness: 2.0,
+                predict: Predictor { value: 2.0 },
+            },
+        ];
+
+        let tournament = Tournament::<Predictor>::new(2);
+
+        let result = tournament.tournament_size(&candidates);
+
+        assert_eq!(result, 2);
     }
 }

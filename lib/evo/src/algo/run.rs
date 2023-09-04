@@ -1,4 +1,4 @@
-use super::{inject_genomes, sort_generation, Tournament};
+use super::{inject_genomes, sort_generation, unrank_generation, Tournament};
 use crate::{Breed, BreedManager, Compare, CompareRecord, FitnessCalc, Generation, Predict};
 use rand::Rng;
 
@@ -67,16 +67,6 @@ where
         }
         next_generation
     }
-}
-
-fn unrank_generation<TGenome>(ranked_generation: Vec<CompareRecord<TGenome>>) -> Generation<TGenome>
-where
-    TGenome: Predict + PartialOrd,
-{
-    ranked_generation
-        .into_iter()
-        .map(|x| x.predict)
-        .collect::<Generation<TGenome>>()
 }
 
 #[cfg(test)]
