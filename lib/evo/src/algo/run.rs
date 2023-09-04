@@ -1,3 +1,4 @@
+use super::sort_generation;
 use crate::{Breed, BreedManager, Compare, CompareRecord, FitnessCalc, Generation, Predict};
 use rand::Rng;
 
@@ -40,10 +41,7 @@ where
 
         generation
             .into_iter()
-            .filter_map(|predict| {
-                let fitness = fitness_calc.check(&predict).ok()?;
-                Some(CompareRecord { fitness, predict })
-            })
+            .filter_map(|predict| fitness_calc.create_compare_record(predict).ok())
             .collect::<Vec<_>>()
     }
 
@@ -135,19 +133,6 @@ where
 
         winner
     }
-}
-
-pub fn sort_generation<TGenome>(
-    candidates: Vec<CompareRecord<TGenome>>,
-) -> Vec<CompareRecord<TGenome>>
-where
-    TGenome: Predict + PartialOrd,
-{
-    let mut candidates = candidates;
-    candidates.sort_by(|left, right| {
-        PartialOrd::partial_cmp(left, right).unwrap_or(std::cmp::Ordering::Equal)
-    });
-    candidates
 }
 
 #[cfg(test)]

@@ -233,11 +233,7 @@ impl Calc {
         let mut best_entity = None;
 
         for entity in entities {
-            let fitness = self.check(entity)?;
-            let record = CompareRecord {
-                fitness,
-                predict: entity,
-            };
+            let record = self.create_compare_record(entity)?;
 
             best_entity = Some(match best_entity {
                 None => record,
@@ -252,6 +248,14 @@ impl Calc {
         }
 
         Ok(best_entity.map(|record| record.predict))
+    }
+
+    pub fn create_compare_record<P>(&self, predict: P) -> Result<CompareRecord<P>>
+    where
+        P: Predict + PartialOrd,
+    {
+        let fitness = self.check(&predict)?;
+        Ok(CompareRecord { fitness, predict })
     }
 }
 
