@@ -204,7 +204,7 @@ impl Calc {
     /// struct Comparator;
     ///
     /// impl Compare<Predictor> for Comparator {
-    ///     fn compare(&self, left: &CompareRecord<Predictor>, right: &CompareRecord<Predictor>) -> Ordering {
+    ///     fn compare(&self, left: &CompareRecord<&Predictor>, right: &CompareRecord<&Predictor>) -> Ordering {
     ///         match (left.fitness.is_nan() || left.fitness.is_infinite(), right.fitness.is_nan() || right.fitness.is_infinite()) {
     ///             (true, true) => Ordering::Equal,
     ///             (true, false) => Ordering::Greater,
@@ -230,20 +230,28 @@ impl Calc {
         P: Predict + PartialOrd,
         C: Compare<P>,
     {
-        let vector = entities
-            .iter()
-            .map(|predict| {
-                let fitness = self.check(predict)?;
-                Ok(CompareRecord { fitness, predict })
-            })
-            .collect::<Result<Vec<_>>>()?;
+        let mut best_entity = None;
 
-        let result = vector
-            .into_iter()
-            .min_by(|left, right| compare.compare(left, right))
-            .map(|record| record.predict);
+        for entity in entities {
+            let fitness = self.check(entity)?;
+            let record = CompareRecord {
+                fitness,
+                predict: entity,
+            };
 
-        Ok(result)
+            best_entity = Some(match best_entity {
+                None => record,
+                Some(best) => {
+                    if compare.compare(&record, &best) == std::cmp::Ordering::Less {
+                        record
+                    } else {
+                        best
+                    }
+                }
+            });
+        }
+
+        Ok(best_entity.map(|record| record.predict))
     }
 }
 
@@ -366,8 +374,8 @@ mod tests {
     impl Compare<Predictor> for Comparator {
         fn compare(
             &self,
-            left: &CompareRecord<Predictor>,
-            right: &CompareRecord<Predictor>,
+            left: &CompareRecord<&Predictor>,
+            right: &CompareRecord<&Predictor>,
         ) -> Ordering {
             left.fitness.partial_cmp(&right.fitness).unwrap()
         }

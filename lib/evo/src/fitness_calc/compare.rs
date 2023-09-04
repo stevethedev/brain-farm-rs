@@ -48,7 +48,7 @@ use super::Predict;
 /// struct Comparator;
 ///
 /// impl Compare<Predictor> for Comparator {
-///     fn compare(&self, left: &CompareRecord<Predictor>, right: &CompareRecord<Predictor>) -> Ordering {
+///     fn compare(&self, left: &CompareRecord<&Predictor>, right: &CompareRecord<&Predictor>) -> Ordering {
 ///         left.fitness.partial_cmp(&right.fitness).unwrap()
 ///     }
 /// }
@@ -63,11 +63,23 @@ where
     P: Predict + PartialOrd,
 {
     /// Compare two entities.
-    fn compare(&self, left: &Record<P>, right: &Record<P>) -> std::cmp::Ordering;
+    fn compare(&self, left: &Record<&P>, right: &Record<&P>) -> std::cmp::Ordering;
+
+    fn compare_raw(&self, left: &Record<P>, right: &Record<P>) -> std::cmp::Ordering {
+        let left = Record {
+            fitness: left.fitness,
+            predict: &left.predict,
+        };
+        let right = Record {
+            fitness: right.fitness,
+            predict: &right.predict,
+        };
+        self.compare(&left, &right)
+    }
 }
 
 /// A record for comparing entities.
-pub struct Record<'a, P>
+pub struct Record<P>
 where
     P: Predict + PartialOrd,
 {
@@ -75,7 +87,7 @@ where
     pub fitness: f64,
 
     /// The prediction function for the entity.
-    pub predict: &'a P,
+    pub predict: P,
 }
 
 #[cfg(test)]
@@ -114,7 +126,7 @@ mod tests {
     fn compare() {
         struct Comparator;
         impl Compare<Predictor> for Comparator {
-            fn compare(&self, left: &Record<Predictor>, right: &Record<Predictor>) -> Ordering {
+            fn compare(&self, left: &Record<&Predictor>, right: &Record<&Predictor>) -> Ordering {
                 left.fitness.partial_cmp(&right.fitness).unwrap()
             }
         }
