@@ -71,7 +71,7 @@ pub struct Record<P>
 where
     P: Predict + PartialOrd,
 {
-    /// The fitness of the entity.
+    /// The fitness of the entity. Smaller values are better.
     pub fitness: f64,
 
     /// The prediction function for the entity.

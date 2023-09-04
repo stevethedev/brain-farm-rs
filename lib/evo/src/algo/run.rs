@@ -1,5 +1,4 @@
-use super::sort_generation;
-use crate::algo::inject_genomes;
+use super::{inject_genomes, sort_generation, Tournament};
 use crate::{Breed, BreedManager, Compare, CompareRecord, FitnessCalc, Generation, Predict};
 use rand::Rng;
 
@@ -78,47 +77,6 @@ where
         .into_iter()
         .map(|x| x.predict)
         .collect::<Generation<TGenome>>()
-}
-
-struct Tournament<TGenome> {
-    _phantom: std::marker::PhantomData<TGenome>,
-    tournament_size: usize,
-}
-
-impl<TGenome> Tournament<TGenome>
-where
-    TGenome: Predict + PartialOrd,
-{
-    pub fn new(tournament_size: usize) -> Self {
-        Self {
-            _phantom: std::marker::PhantomData,
-            tournament_size,
-        }
-    }
-
-    pub fn select<'x>(
-        &self,
-        candidates: &'x [CompareRecord<TGenome>],
-    ) -> Option<&'x CompareRecord<TGenome>> {
-        let candidate_count = candidates.len();
-        let tournament_size = usize::min(candidate_count, self.tournament_size);
-
-        let mut winner = None;
-        for _ in 0..tournament_size {
-            let id = rand::thread_rng().gen_range(0..candidate_count);
-            let candidate = candidates.get(id)?;
-
-            winner = Some(match winner {
-                None => candidate,
-                Some(winner) => match PartialOrd::partial_cmp(winner, candidate) {
-                    Some(std::cmp::Ordering::Less) => winner,
-                    _ => candidate,
-                },
-            });
-        }
-
-        winner
-    }
 }
 
 #[cfg(test)]
