@@ -14,7 +14,7 @@ pub use sigmoid::Sigmoid;
 ///
 /// let lin = ActivationFunction::linear();
 /// ```
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Function {
     Linear(Linear),
     Sigmoid(Sigmoid),

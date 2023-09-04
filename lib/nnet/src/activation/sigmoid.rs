@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 /// Sigmoid activation function
 ///
 /// This function is used to squash the output of a neuron to a value between 0 and 1.
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Sigmoid;
 
 impl Activate for Sigmoid {

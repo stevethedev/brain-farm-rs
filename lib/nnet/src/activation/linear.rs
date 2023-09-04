@@ -2,7 +2,7 @@ use super::{Activate, Function};
 use serde::{Deserialize, Serialize};
 
 /// Linear activation function.
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Linear;
 
 impl Activate for Linear {
