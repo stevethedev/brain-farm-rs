@@ -31,3 +31,12 @@ pub trait Predict {
     /// The predicted output.
     fn predict(&self, input: &[f64]) -> Vec<f64>;
 }
+
+impl<P> Predict for &P
+where
+    P: Predict,
+{
+    fn predict(&self, input: &[f64]) -> Vec<f64> {
+        (*self).predict(input)
+    }
+}
