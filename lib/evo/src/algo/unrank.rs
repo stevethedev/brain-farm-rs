@@ -1,8 +1,6 @@
 use crate::{CompareRecord, Generation, Predict};
 
-pub fn unrank_generation<TGenome>(
-    ranked_generation: Vec<CompareRecord<TGenome>>,
-) -> Generation<TGenome>
+pub fn generation<TGenome>(ranked_generation: Vec<CompareRecord<TGenome>>) -> Generation<TGenome>
 where
     TGenome: Predict + PartialOrd,
 {
@@ -55,7 +53,7 @@ mod tests {
             Predictor { value: 2.0 },
         ];
 
-        let result = unrank_generation(ranked_generation);
+        let result = generation(ranked_generation);
 
         assert_eq!(result, expected);
     }

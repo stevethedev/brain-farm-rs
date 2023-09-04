@@ -250,6 +250,45 @@ impl Calc {
         Ok(best_entity.map(|record| record.predict))
     }
 
+    /// Create a `CompareRecord` for an entity.
+    ///
+    /// # Arguments
+    ///
+    /// - `predict` is the entity.
+    ///
+    /// # Returns
+    ///
+    /// The `CompareRecord`.
+    ///
+    /// # Errors
+    ///
+    /// If the fitness of the entity cannot be calculated.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use evo::{CompareRecord, FitnessCalc, Predict, TrainingRecord};
+    ///
+    /// #[derive(Debug, PartialEq, PartialOrd)]
+    /// struct Predictor;
+    ///
+    /// impl Predict for Predictor {
+    ///     fn predict(&self, input: &[f64]) -> Vec<f64> {
+    ///        input.to_vec()
+    ///    }
+    /// }
+    ///
+    /// let fitness_calc = FitnessCalc::builder()
+    ///     .add_training_record(TrainingRecord {
+    ///         input: vec![1.0, 2.0, 3.0, 4.0],
+    ///         output: vec![1.0, 2.0, 3.0, 4.0],
+    ///     })
+    ///     .build();
+    ///
+    /// let record = fitness_calc.create_compare_record(&Predictor).unwrap();
+    ///
+    /// assert_eq!(record.fitness, 0.0);
+    /// ```
     pub fn create_compare_record<P>(&self, predict: P) -> Result<CompareRecord<P>>
     where
         P: Predict + PartialOrd,

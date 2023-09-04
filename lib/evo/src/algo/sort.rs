@@ -1,8 +1,6 @@
 use crate::{CompareRecord, Predict};
 
-pub fn sort_generation<TGenome>(
-    candidates: Vec<CompareRecord<TGenome>>,
-) -> Vec<CompareRecord<TGenome>>
+pub fn generation<TGenome>(candidates: Vec<CompareRecord<TGenome>>) -> Vec<CompareRecord<TGenome>>
 where
     TGenome: Predict + PartialOrd,
 {
@@ -73,7 +71,7 @@ mod tests {
                 predict: Predictor { value: 3.0 },
             },
         ];
-        let actual = sort_generation(candidates);
+        let actual = generation(candidates);
         assert_eq!(actual, expected);
     }
 }

@@ -5,8 +5,8 @@ mod tournament;
 mod unrank;
 
 pub use self::{
-    inject::inject_genomes, sort::sort_generation, tournament::Tournament,
-    unrank::unrank_generation,
+    inject::genomes as inject_genomes, sort::generation as sort_generation, tournament::Tournament,
+    unrank::generation as unrank_generation,
 };
 
 /// Algorithms for evolving populations.

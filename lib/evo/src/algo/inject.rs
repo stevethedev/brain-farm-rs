@@ -1,7 +1,7 @@
 use crate::{Generation, Predict};
 use rand::Rng;
 
-pub fn inject_genomes<TGenome>(
+pub fn genomes<TGenome>(
     mut generation: Generation<TGenome>,
     elite: Generation<TGenome>,
 ) -> Generation<TGenome>
@@ -45,13 +45,8 @@ mod tests {
             Predictor { value: 3.0 },
         ];
         let elite = vec![Predictor { value: 4.0 }];
-        let expected = vec![
-            Predictor { value: 4.0 },
-            Predictor { value: 2.0 },
-            Predictor { value: 3.0 },
-        ];
 
-        let result = inject_genomes(generation, elite);
+        let result = genomes(generation, elite);
 
         assert_ne!(
             result.into_iter().find(|p| p == &Predictor { value: 4.0 }),

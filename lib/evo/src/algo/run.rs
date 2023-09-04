@@ -1,6 +1,5 @@
 use super::{inject_genomes, sort_generation, unrank_generation, Tournament};
 use crate::{Breed, BreedManager, Compare, CompareRecord, FitnessCalc, Generation, Predict};
-use rand::Rng;
 
 pub struct Run<TGenome, TBreeder>
 where
@@ -21,18 +20,25 @@ where
     pub fn run(&self, generation: Generation<TGenome>) -> Generation<TGenome> {
         let ranked_generation = self.rank_generation(generation);
 
-        let next_generation = self.new_generation(&ranked_generation);
-        let next_generation = unrank_generation(next_generation);
+        let next_generation = self.breed_generation(&ranked_generation);
+        let elite = self.partition_elite(ranked_generation);
 
+        inject_genomes(next_generation, elite)
+    }
+
+    fn breed_generation(&self, parent_generation: &[CompareRecord<TGenome>]) -> Vec<TGenome> {
+        let next_generation = self.new_generation(parent_generation);
+        unrank_generation(next_generation)
+    }
+
+    fn partition_elite(&self, ranked_generation: Vec<CompareRecord<TGenome>>) -> Vec<TGenome> {
         let sorted_generation = sort_generation(ranked_generation);
         let sorted_generation = unrank_generation(sorted_generation);
 
         let elitism = std::cmp::min(self.elitism, sorted_generation.len());
         let mut elite = sorted_generation;
         elite.truncate(elitism);
-        let elite = elite;
-
-        inject_genomes(next_generation, elite)
+        elite
     }
 
     fn rank_generation(&self, generation: Generation<TGenome>) -> Vec<CompareRecord<TGenome>> {

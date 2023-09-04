@@ -1,6 +1,5 @@
 use crate::{CompareRecord, Predict};
 use rand::prelude::*;
-use rand::Rng;
 
 pub struct Tournament<TGenome> {
     _phantom: std::marker::PhantomData<TGenome>,
