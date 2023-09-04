@@ -1,5 +1,14 @@
 use crate::{CompareRecord, Predict};
 
+/// Sort a generation of candidates by fitness.
+///
+/// # Arguments
+///
+/// * `candidates` - A vector of `CompareRecord` candidates.
+///
+/// # Returns
+///
+/// A vector of `CompareRecord` candidates sorted by fitness.
 pub fn generation<TGenome>(candidates: Vec<CompareRecord<TGenome>>) -> Vec<CompareRecord<TGenome>>
 where
     TGenome: Predict + PartialOrd,

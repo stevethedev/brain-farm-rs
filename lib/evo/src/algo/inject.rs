@@ -1,6 +1,17 @@
 use crate::{Generation, Predict};
 use rand::Rng;
 
+/// Replace a portion of the current generation with elite genomes,
+/// preserving the rest of the generation.
+///
+/// # Parameters
+///
+/// - `generation`: The current generation of genomes to be updated.
+/// - `elite`: The elite generation of genomes that will be inserted into the current generation.
+///
+/// # Returns
+///
+/// A new generation of genomes with a portion of the elites integrated.
 pub fn genomes<TGenome>(
     mut generation: Generation<TGenome>,
     elite: Generation<TGenome>,

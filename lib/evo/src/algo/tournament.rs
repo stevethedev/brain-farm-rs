@@ -1,26 +1,41 @@
 use crate::{CompareRecord, Predict};
 use rand::prelude::*;
 
-pub struct Tournament<TGenome> {
-    _phantom: std::marker::PhantomData<TGenome>,
+/// Tournament selection algorithm.
+pub struct Tournament {
     tournament_size: usize,
 }
 
-impl<TGenome> Tournament<TGenome>
-where
-    TGenome: Predict + PartialOrd,
-{
+impl Tournament {
+    /// Create a new tournament selection algorithm.
+    ///
+    /// # Arguments
+    ///
+    /// * `tournament_size` - The number of candidates to select from.
+    ///
+    /// # Returns
+    ///
+    /// The tournament selection algorithm.
     pub fn new(tournament_size: usize) -> Self {
-        Self {
-            _phantom: std::marker::PhantomData,
-            tournament_size,
-        }
+        Self { tournament_size }
     }
 
-    pub fn select<'x>(
+    /// Select a candidate from a list of candidates.
+    ///
+    /// # Arguments
+    ///
+    /// * `candidates` - The list of candidates to select from.
+    ///
+    /// # Returns
+    ///
+    /// The selected candidate.
+    pub fn select<'x, TGenome>(
         &self,
         candidates: &'x [CompareRecord<TGenome>],
-    ) -> Option<&'x CompareRecord<TGenome>> {
+    ) -> Option<&'x CompareRecord<TGenome>>
+    where
+        TGenome: Predict + PartialOrd,
+    {
         let mut winner = None;
         for candidate in self.tournament_iter(candidates) {
             winner = Some(match winner {
@@ -35,10 +50,22 @@ where
         winner
     }
 
-    fn tournament_iter<'x>(
+    /// Create an iterator over the tournament candidates.
+    ///
+    /// # Arguments
+    ///
+    /// * `candidates` - The list of candidates to select from.
+    ///
+    /// # Returns
+    ///
+    /// An iterator over the tournament candidates.
+    fn tournament_iter<'x, TGenome>(
         &self,
         candidates: &'x [CompareRecord<TGenome>],
-    ) -> impl Iterator<Item = &'x CompareRecord<TGenome>> {
+    ) -> impl Iterator<Item = &'x CompareRecord<TGenome>>
+    where
+        TGenome: Predict + PartialOrd,
+    {
         let tournament_size = self.tournament_size(candidates);
 
         let mut indexes = (0..candidates.len()).collect::<Vec<_>>();
@@ -49,7 +76,16 @@ where
             .map(move |id| &candidates[id])
     }
 
-    pub fn tournament_size<T>(&self, candidates: &[T]) -> usize {
+    /// Get the tournament size.
+    ///
+    /// # Arguments
+    ///
+    /// * `candidates` - The list of candidates to select from.
+    ///
+    /// # Returns
+    ///
+    /// The tournament size.
+    pub fn tournament_size<TGenome>(&self, candidates: &[TGenome]) -> usize {
         usize::min(self.tournament_size, candidates.len())
     }
 }
@@ -161,7 +197,7 @@ mod tests {
             },
         ];
 
-        let tournament = Tournament::<Predictor>::new(2);
+        let tournament = Tournament::new(2);
 
         let result = tournament.tournament_size(&candidates);
 

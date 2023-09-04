@@ -1,5 +1,14 @@
 use crate::{CompareRecord, Generation, Predict};
 
+/// Unrank a generation of candidates.
+///
+/// # Arguments
+///
+/// * `ranked_generation` - A vector of `CompareRecord` candidates.
+///
+/// # Returns
+///
+/// A vector of `Predict` candidates.
 pub fn generation<TGenome>(ranked_generation: Vec<CompareRecord<TGenome>>) -> Generation<TGenome>
 where
     TGenome: Predict + PartialOrd,
