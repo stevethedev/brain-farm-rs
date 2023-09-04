@@ -13,7 +13,7 @@ mod fitness_calc;
 mod genome;
 
 pub use self::{
-    algo::Algorithm,
+    algo::Algorithm as EvoAlgorithm,
     breed::{Breed, Manager as BreedManager},
     fitness_calc::{Compare, CompareRecord, FitnessCalc, Predict, TrainingRecord},
     genome::{Generation, Stock},

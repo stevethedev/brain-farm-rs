@@ -1,5 +1,5 @@
 use super::{inject_genomes, sort_generation, unrank_generation, Tournament};
-use crate::{Breed, BreedManager, Compare, CompareRecord, FitnessCalc, Generation, Predict};
+use crate::{Breed, BreedManager, CompareRecord, FitnessCalc, Generation, Predict};
 
 pub struct Run<TGenome, TBreeder>
 where
@@ -17,6 +17,10 @@ where
     TGenome: Predict + PartialOrd,
     TBreeder: Breed<TGenome>,
 {
+    pub fn builder() -> Builder {
+        Builder::default()
+    }
+
     pub fn run(&self, generation: Generation<TGenome>) -> Generation<TGenome> {
         let ranked_generation = self.rank_generation(generation);
 
@@ -74,10 +78,53 @@ where
     }
 }
 
+pub struct Builder {
+    elitism: usize,
+    tournament_size: usize,
+}
+
+impl Default for Builder {
+    fn default() -> Self {
+        Self {
+            elitism: 1,
+            tournament_size: 10,
+        }
+    }
+}
+
+impl Builder {
+    pub fn build<TGenome, TBreeder>(
+        self,
+        breeder: TBreeder,
+        fitness_calc: FitnessCalc,
+    ) -> Run<TGenome, TBreeder>
+    where
+        TGenome: Predict + PartialOrd,
+        TBreeder: Breed<TGenome>,
+    {
+        Run {
+            breeder: breeder.to_manager(),
+            fitness_calc,
+            elitism: self.elitism,
+            tournament_size: self.tournament_size,
+        }
+    }
+
+    pub fn elitism(mut self, elitism: usize) -> Self {
+        self.elitism = elitism;
+        self
+    }
+
+    pub fn tournament_size(mut self, tournament_size: usize) -> Self {
+        self.tournament_size = tournament_size;
+        self
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Breed, TrainingRecord};
+    use crate::{Breed, Compare, TrainingRecord};
 
     #[test]
     fn test_run() {
