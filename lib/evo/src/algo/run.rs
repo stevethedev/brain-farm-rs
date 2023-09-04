@@ -1,4 +1,5 @@
 use super::sort_generation;
+use crate::algo::inject_genomes;
 use crate::{Breed, BreedManager, Compare, CompareRecord, FitnessCalc, Generation, Predict};
 use rand::Rng;
 
@@ -77,21 +78,6 @@ where
         .into_iter()
         .map(|x| x.predict)
         .collect::<Generation<TGenome>>()
-}
-
-fn inject_genomes<TGenome>(
-    mut generation: Generation<TGenome>,
-    elite: Generation<TGenome>,
-) -> Generation<TGenome>
-where
-    TGenome: Predict + PartialOrd,
-{
-    let generation_size = generation.len();
-    for genome in elite {
-        let generation_index = rand::thread_rng().gen_range(0..generation_size);
-        generation[generation_index] = genome;
-    }
-    generation
 }
 
 struct Tournament<TGenome> {
