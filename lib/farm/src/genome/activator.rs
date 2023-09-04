@@ -1,3 +1,8 @@
+use super::Crossover;
+use crate::mutate::Target;
+use rand::distributions::Standard;
+use rand::prelude::Distribution;
+
 /// The gene for an activation function.
 ///
 /// # Examples
@@ -7,24 +12,28 @@
 ///
 /// let gene = Gene::Linear;
 /// ```
+#[derive(Clone, Debug, PartialEq)]
 pub struct Genome {
-    activator: Gene,
+    pub activator: Gene,
 }
 
-impl Genome {
-    /// Create a new activation function gene.
-    pub fn new(activator: Gene) -> Self {
-        Self { activator }
-    }
-
-    /// Get the activation function.
-    pub fn activator(&self) -> &Gene {
-        &self.activator
-    }
-
-    /// Set the activation function.
-    pub fn set_activator(&mut self, activator: Gene) {
-        self.activator = activator;
+/// Enable crossover for [`Genome`].
+///
+/// # Examples
+///
+/// ```
+/// use farm::genome::{Crossover, activator::{Genome, Gene}};
+///
+/// let left = Genome { activator: Gene::Linear };
+/// let right = Genome { activator: Gene::Sigmoid };
+///
+/// let target = left.crossover(&right);
+/// ```
+impl Crossover for Genome {
+    fn crossover(&self, other: &Self) -> Self {
+        Self {
+            activator: self.activator.crossover(&other.activator),
+        }
     }
 }
 
@@ -38,25 +47,64 @@ pub enum Gene {
     Sigmoid,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_new() {
-        let gene = Gene::Linear;
-        let genome = Genome::new(gene.clone());
-        assert_eq!(genome.activator(), &gene);
+impl Distribution<Gene> for Standard {
+    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Gene {
+        match rng.gen_range(0..2) {
+            0 => Gene::Linear,
+            _ => Gene::Sigmoid,
+        }
     }
+}
 
-    #[test]
-    fn test_activator() {
-        let gene = Gene::Linear;
-        let mut genome = Genome::new(gene.clone());
-        assert_eq!(genome.activator(), &gene);
+/// Enable crossover for [`Gene`].
+///
+/// # Examples
+///
+/// ```
+/// use farm::genome::{Crossover, activator::Gene};
+///
+/// let left = Gene::Linear;
+/// let right = Gene::Sigmoid;
+///
+/// let target = left.crossover(&right);
+/// ```
+impl Crossover for Gene {
+    fn crossover(&self, other: &Self) -> Self {
+        match (self, other) {
+            (Self::Linear, Self::Linear) => Self::Linear,
+            (Self::Sigmoid, Self::Sigmoid) => Self::Sigmoid,
+            _ => {
+                if rand::random() {
+                    self.clone()
+                } else {
+                    other.clone()
+                }
+            }
+        }
+    }
+}
 
-        let gene = Gene::Sigmoid;
-        genome.set_activator(gene.clone());
-        assert_eq!(genome.activator(), &gene);
+/// Ensures that the gene can be bred.
+///
+/// # Examples
+///
+/// ```
+/// use farm::{
+///     genome::activator::Gene,
+///     mutate::{Mutator, Target},
+/// };
+///
+/// let mutator = Mutator::builder().build();
+///
+/// let gene = Gene::Linear;
+/// let gene = mutator.mutate(gene);
+/// ```
+impl Target for Gene {
+    fn mutate(mut self, mutator: &crate::mutate::Mutator) -> Self {
+        if mutator.mutation_size() > 0.0 && mutator.check_mutate() {
+            self = rand::random::<Gene>();
+        }
+
+        self
     }
 }

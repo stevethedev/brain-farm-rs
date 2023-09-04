@@ -1,9 +1,31 @@
+use crate::genome::Crossover;
 use crate::{
-    genome::activator::{Gene, Genome},
-    mutate::Mutator,
+    genome::activator::Genome,
+    mutate::{Mutator, Target},
 };
 use evo::Breed;
-use rand::prelude::Distribution;
+
+/// Ensures that the genome can be bred.
+///
+/// # Examples
+///
+/// ```
+/// use farm::{
+///     genome::activator::{Gene, Genome},
+///     mutate::{Mutator, Target},
+/// };
+///
+/// let mutator = Mutator::builder().build();
+///
+/// let genome = Genome { activator: Gene::Linear };
+/// let genome = genome.mutate(&mutator);
+/// ```
+impl Target for Genome {
+    fn mutate(mut self, mutator: &Mutator) -> Self {
+        self.activator = self.activator.mutate(mutator);
+        self
+    }
+}
 
 /// Breeds activation functions.
 ///
@@ -18,8 +40,8 @@ use rand::prelude::Distribution;
 ///
 /// let mutator = Mutator::builder().build();
 ///
-/// let left = Genome::new(Gene::Linear);
-/// let right = Genome::new(Gene::Sigmoid);
+/// let left = Genome { activator: Gene::Linear };
+/// let right = Genome { activator: Gene::Sigmoid };
 ///
 /// let breeder = Breeder::new(mutator);
 /// let offspring = breeder.crossover((&left, &right));
@@ -44,53 +66,62 @@ impl Breeder {
 }
 
 impl Breed<Genome> for Breeder {
-    fn crossover(&self, (left, right): (&Genome, &Genome)) -> Genome {
-        let activator = if self.mutator.check_mutate() {
-            left.activator()
-        } else {
-            right.activator()
-        };
-
-        Genome::new(activator.clone())
+    /// Breed offspring from two parents.
+    ///
+    /// # Arguments
+    ///
+    /// - `parents` - The parents to breed.
+    ///
+    /// # Returns
+    ///
+    /// The offspring.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::{
+    ///     breed::{Breed, activator::Breeder},
+    ///     mutate::Mutator,
+    ///     genome::activator::{Genome, Gene},
+    /// };
+    ///
+    /// let mutator = Mutator::builder().build();
+    ///
+    /// let left = Genome { activator: Gene::Linear };
+    /// let right = Genome { activator: Gene::Sigmoid };
+    ///
+    /// let breeder = Breeder::new(mutator);
+    /// let offspring = breeder.crossover((&left, &right));
+    /// ```
+    fn crossover(&self, parents: (&Genome, &Genome)) -> Genome {
+        Genome::crossover(parents.0, parents.1)
     }
 
-    fn mutate(&self, mut genome: Genome) -> Genome {
-        if self.mutator.mutation_size() > 0.0 && self.mutator.check_mutate() {
-            let af = rand::random::<Gene>();
-            genome.set_activator(af);
-        }
-
-        genome
-    }
-}
-
-impl Distribution<Gene> for rand::distributions::Standard {
-    fn sample<R: rand::Rng + ?Sized>(&self, rng: &mut R) -> Gene {
-        match rng.gen_range(0..2) {
-            0 => Gene::Linear,
-            _ => Gene::Sigmoid,
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_crossover() {
-        let mutator = Mutator::builder().mutation_rate(1.0).build();
-
-        let left = Genome::new(Gene::Linear);
-        let right = Genome::new(Gene::Sigmoid);
-
-        let breeder = Breeder::new(mutator);
-        let offspring = breeder.crossover((&left, &right));
-
-        assert_eq!(offspring.activator(), &Gene::Linear);
-
-        let offspring = breeder.crossover((&right, &left));
-
-        assert_eq!(offspring.activator(), &Gene::Sigmoid);
+    /// Mutate the genome.
+    ///
+    /// # Arguments
+    ///
+    /// - `genome` - The genome to mutate.
+    ///
+    /// # Returns
+    ///
+    /// The mutated genome.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::{
+    ///     breed::{Breed, activator::Breeder},
+    ///     mutate::{Mutator, Target},
+    ///     genome::activator::{Genome, Gene},
+    /// };
+    ///
+    /// let mutator = Mutator::builder().build();
+    ///
+    /// let genome = Genome { activator: Gene::Linear };
+    /// let genome = mutator.mutate(genome);
+    /// ```
+    fn mutate(&self, genome: Genome) -> Genome {
+        genome.mutate(&self.mutator)
     }
 }
