@@ -3,7 +3,7 @@
 /// # Examples
 ///
 /// ```
-/// use evo::GenomeBreeder;
+/// use evo::Breed;
 ///
 /// #[derive(Debug, PartialEq)]
 /// struct Genome {
@@ -12,7 +12,7 @@
 ///
 /// struct Breeder;
 ///
-/// impl GenomeBreeder<Genome> for Breeder {
+/// impl Breed<Genome> for Breeder {
 ///     fn crossover(&self, pair: (&Genome, &Genome)) -> Genome {
 ///         Genome {
 ///             value: (pair.0.value + pair.1.value) / 2.0,
@@ -26,7 +26,7 @@
 /// let offspring = breeder.crossover((&left, &right));
 /// assert_eq!(offspring, Genome { value: 1.5 });
 /// ```
-pub trait Breeder<TGenome> {
+pub trait Breed<TGenome> {
     /// Crossover two genomes.
     ///
     /// # Arguments
@@ -51,7 +51,7 @@ pub trait Breeder<TGenome> {
     /// # Examples
     ///
     /// ```
-    /// use evo::GenomeBreeder;
+    /// use evo::Breed;
     ///
     /// #[derive(Debug, PartialEq)]
     /// struct Genome {
@@ -60,7 +60,7 @@ pub trait Breeder<TGenome> {
     ///
     /// struct Breeder;
     ///
-    /// impl GenomeBreeder<Genome> for Breeder {
+    /// impl Breed<Genome> for Breeder {
     ///     fn crossover(&self, pair: (&Genome, &Genome)) -> Genome {
     ///         Genome {
     ///             value: (pair.0.value + pair.1.value) / 2.0,
@@ -91,7 +91,7 @@ pub trait Breeder<TGenome> {
     /// # Examples
     ///
     /// ```
-    /// use evo::{GenomeBreeder};
+    /// use evo::Breed;
     ///
     /// #[derive(Debug, PartialEq)]
     /// struct Genome {
@@ -100,12 +100,12 @@ pub trait Breeder<TGenome> {
     ///
     /// struct Breeder;
     ///
-    /// impl GenomeBreeder<Genome> for Breeder {
+    /// impl Breed<Genome> for Breeder {
     ///    fn crossover(&self, pair: (&Genome, &Genome)) -> Genome {
-    ///      Genome {
-    ///        value: (pair.0.value + pair.1.value) / 2.0,
+    ///         Genome {
+    ///             value: (pair.0.value + pair.1.value) / 2.0,
+    ///         }
     ///     }
-    /// }
     /// }
     ///
     /// let manager = Breeder.to_manager();
@@ -127,7 +127,7 @@ pub trait Breeder<TGenome> {
 /// # Examples
 ///
 /// ```
-/// use evo::{GenomeBreeder};
+/// use evo::Breed;
 ///
 /// #[derive(Debug, PartialEq)]
 /// struct Genome {
@@ -136,7 +136,7 @@ pub trait Breeder<TGenome> {
 ///
 /// struct Breeder;
 ///
-/// impl GenomeBreeder<Genome> for Breeder {
+/// impl Breed<Genome> for Breeder {
 ///    fn crossover(&self, pair: (&Genome, &Genome)) -> Genome {
 ///       Genome {
 ///         value: (pair.0.value + pair.1.value) / 2.0,
@@ -152,7 +152,7 @@ pub trait Breeder<TGenome> {
 /// ```
 pub struct Manager<TGenome, TBreeder>
 where
-    TBreeder: Breeder<TGenome>,
+    TBreeder: Breed<TGenome>,
 {
     _phantom: std::marker::PhantomData<TGenome>,
     breeder: TBreeder,
@@ -160,7 +160,7 @@ where
 
 impl<TGenome, TBreeder> Manager<TGenome, TBreeder>
 where
-    TBreeder: Breeder<TGenome>,
+    TBreeder: Breed<TGenome>,
 {
     /// Create a new manager.
     ///
@@ -192,7 +192,7 @@ where
     /// # Examples
     ///
     /// ```
-    /// use evo::{GenomeBreeder};
+    /// use evo::Breed;
     ///
     /// #[derive(Debug, PartialEq)]
     /// struct Genome {
@@ -201,7 +201,7 @@ where
     ///
     /// struct Breeder;
     ///
-    /// impl GenomeBreeder<Genome> for Breeder {
+    /// impl Breed<Genome> for Breeder {
     ///     fn crossover(&self, pair: (&Genome, &Genome)) -> Genome {
     ///         Genome {
     ///             value: (pair.0.value + pair.1.value) / 2.0,
@@ -234,7 +234,7 @@ mod tests {
 
         struct Breeder;
 
-        impl super::Breeder<Genome> for Breeder {
+        impl Breed<Genome> for Breeder {
             fn crossover(&self, pair: (&Genome, &Genome)) -> Genome {
                 Genome {
                     value: (pair.0.value + pair.1.value) / 2.0,
