@@ -1,3 +1,5 @@
+mod run;
+
 /// Algorithms for evolving populations.
 ///
 /// # Examples
@@ -29,10 +31,6 @@ impl Algorithm {
     #[must_use]
     pub fn builder() -> Builder {
         Builder::default()
-    }
-
-    pub fn run(&self) {
-        println!("Algorithm::run()");
     }
 }
 

@@ -64,18 +64,6 @@ where
 {
     /// Compare two entities.
     fn compare(&self, left: &Record<&P>, right: &Record<&P>) -> std::cmp::Ordering;
-
-    fn compare_raw(&self, left: &Record<P>, right: &Record<P>) -> std::cmp::Ordering {
-        let left = Record {
-            fitness: left.fitness,
-            predict: &left.predict,
-        };
-        let right = Record {
-            fitness: right.fitness,
-            predict: &right.predict,
-        };
-        self.compare(&left, &right)
-    }
 }
 
 /// A record for comparing entities.
@@ -88,6 +76,36 @@ where
 
     /// The prediction function for the entity.
     pub predict: P,
+}
+
+impl<P> PartialEq for Record<P>
+where
+    P: Predict + PartialOrd,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.fitness.eq(&other.fitness)
+    }
+}
+
+impl<P> PartialOrd for Record<P>
+where
+    P: Predict + PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.fitness.partial_cmp(&other.fitness)
+    }
+}
+
+impl<P> Record<P>
+where
+    P: Predict + PartialOrd,
+{
+    pub fn as_deref(&self) -> Record<&P> {
+        Record {
+            fitness: self.fitness,
+            predict: &self.predict,
+        }
+    }
 }
 
 #[cfg(test)]
