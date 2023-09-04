@@ -7,7 +7,6 @@ where
     TGenome: Predict + PartialOrd,
     TBreeder: Breed<TGenome>,
 {
-    _phantom: std::marker::PhantomData<TGenome>,
     breeder: BreedManager<TGenome, TBreeder>,
     fitness_calc: FitnessCalc,
     elitism: usize,
@@ -116,7 +115,6 @@ mod tests {
             .build();
 
         let run = Run {
-            _phantom: std::marker::PhantomData,
             breeder: Breeder.to_manager(),
             tournament_size: 2,
             fitness_calc,
