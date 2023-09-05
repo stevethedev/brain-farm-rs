@@ -1,7 +1,54 @@
 pub mod activator;
+pub mod layer;
 pub mod neuron;
 
 use rand::{random, thread_rng, Rng};
+
+/// Enable automatic generation of a gene or genome.
+///
+/// # Examples
+///
+/// ```
+/// use rand::{Rng, thread_rng};
+/// use farm::genome::Generate;
+///
+/// struct Genome {
+///     value: f64,
+/// }
+///
+/// impl Generate<std::ops::Range<f64>> for Genome {
+///     fn generate(config: std::ops::Range<f64>) -> Self {
+///         let value = thread_rng().gen_range(config.start..config.end);
+///         Self { value }
+///     }
+/// }
+///
+/// let config = 0.0..1.0;
+/// let genome = Genome::generate(config);
+///
+/// assert!(
+///     genome.value >= 0.0 && genome.value < 1.0,
+///     "expected {value} to be between {start} and {end}",
+///     value = genome.value,
+///     start = 0.0,
+///     end = 1.0,
+/// );
+/// ```
+pub trait Generate<TConfig> {
+    fn generate(config: TConfig) -> Self;
+}
+
+impl Generate<std::ops::Range<f64>> for f64 {
+    fn generate(config: std::ops::Range<f64>) -> Self {
+        thread_rng().gen_range(config.start..config.end)
+    }
+}
+
+impl Generate<std::ops::RangeInclusive<f64>> for f64 {
+    fn generate(config: std::ops::RangeInclusive<f64>) -> Self {
+        thread_rng().gen_range(*config.start()..=*config.end())
+    }
+}
 
 /// Enable crossover for a gene or genome.
 pub trait Crossover {
@@ -98,9 +145,9 @@ where
         let min_size = usize::min(self_len, other_len);
 
         let rest = if self_len < other_len {
-            other.into_iter().skip(min_size)
+            other.iter().skip(min_size)
         } else {
-            self.into_iter().skip(min_size)
+            self.iter().skip(min_size)
         };
 
         Iterator::zip(self.iter(), other.iter())

@@ -1,7 +1,6 @@
 use super::Crossover;
-use crate::mutate::Target;
-use rand::distributions::Standard;
-use rand::prelude::Distribution;
+use crate::mutate::{Mutator, Target};
+use rand::distributions::{Distribution, Standard};
 
 /// The gene for an activation function.
 ///
@@ -15,6 +14,74 @@ use rand::prelude::Distribution;
 #[derive(Clone, Debug, PartialEq)]
 pub struct Genome {
     pub activator: Gene,
+}
+
+impl super::Generate<()> for Genome {
+    /// Create a new genome with a random activation function.
+    ///
+    /// # Returns
+    ///
+    /// The new genome.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::activator::Genome;
+    /// use farm::genome::Generate;
+    ///
+    /// let genome = Genome::generate(());
+    /// ```
+    fn generate(_: ()) -> Self {
+        Self::generate(rand::random::<Gene>)
+    }
+}
+
+impl<F> super::Generate<F> for Genome
+where
+    F: Fn() -> Gene,
+{
+    /// Create a new genome with a random activation function.
+    ///
+    /// # Returns
+    ///
+    /// The new genome.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::activator::{Genome, Gene};
+    /// use farm::genome::Generate;
+    ///
+    /// let genome = Genome::generate(|| Gene::Sigmoid);
+    /// assert_eq!(genome.activator, Gene::Sigmoid);
+    /// ```
+    fn generate(activator_generator: F) -> Self {
+        Self {
+            activator: activator_generator(),
+        }
+    }
+}
+
+/// Ensures that the genome can be bred.
+///
+/// # Examples
+///
+/// ```
+/// use farm::{
+///     genome::activator::{Gene, Genome},
+///     mutate::{Mutator, Target},
+/// };
+///
+/// let mutator = Mutator::builder().build();
+///
+/// let genome = Genome { activator: Gene::Linear };
+/// let genome = genome.mutate(&mutator);
+/// ```
+impl Target for Genome {
+    fn mutate(mut self, mutator: &Mutator) -> Self {
+        self.activator = self.activator.mutate(mutator);
+        self
+    }
 }
 
 /// Enable crossover for [`Genome`].
