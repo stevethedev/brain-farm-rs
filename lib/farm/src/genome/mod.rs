@@ -1,5 +1,6 @@
 pub mod activator;
 pub mod layer;
+pub mod network;
 pub mod neuron;
 
 use rand::{random, thread_rng, Rng};

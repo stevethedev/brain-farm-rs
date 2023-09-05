@@ -24,7 +24,7 @@ use crate::{
 /// let genome = layer::Genome { neurons: neurons.clone() };
 /// assert_eq!(genome.neurons, neurons);
 /// ```
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Genome {
     pub neurons: Gene,
 }
