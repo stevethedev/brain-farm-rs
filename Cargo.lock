@@ -12,6 +12,7 @@ checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
 name = "brain-farm-cli"
 version = "0.1.0"
 dependencies = [
+ "farm",
  "nnet",
 ]
 
@@ -92,6 +93,8 @@ dependencies = [
  "evo",
  "nnet",
  "rand",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

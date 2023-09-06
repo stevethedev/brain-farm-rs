@@ -17,7 +17,7 @@ use crate::mutate::{Mutator, Target, VecMutation};
 /// assert_eq!(genome.weights, weights);
 /// assert_eq!(genome.bias, bias);
 /// ```
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Genome {
     pub activator: activator::Genome,
     pub weights: Vec<Gene>,
@@ -171,3 +171,56 @@ fn mutate_weights(weights: &mut Vec<Gene>) {
 }
 
 pub type Gene = f64;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_serialize() {
+        let activator = activator::Genome {
+            activator: activator::Gene::Linear,
+        };
+        let weights = vec![0.0, 1.0, 2.0];
+        let bias = 3.0;
+        let genome = Genome {
+            activator: activator.clone(),
+            weights: weights.clone(),
+            bias,
+        };
+        let serialized = serde_json::to_string(&genome).unwrap();
+        let expected = r#"{"activator":{"activator":"Linear"},"weights":[0.0,1.0,2.0],"bias":3.0}"#;
+
+        assert_eq!(serialized, expected);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let activator = activator::Genome {
+            activator: activator::Gene::Linear,
+        };
+        let weights = vec![0.0, 1.0, 2.0];
+        let bias = 3.0;
+        let genome = Genome {
+            activator: activator.clone(),
+            weights: weights.clone(),
+            bias,
+        };
+        let serialized = r#"
+            {
+                "activator": {
+                    "activator": "Linear"
+                },
+                "weights": [
+                    0.0,
+                    1.0,
+                    2.0
+                ],
+                "bias": 3.0
+            }
+        "#;
+        let deserialized: Genome = serde_json::from_str(&serialized).unwrap();
+
+        assert_eq!(deserialized, genome);
+    }
+}

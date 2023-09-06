@@ -47,6 +47,8 @@ const NETWORK_JSON: &str = r#"
 "#;
 
 fn main() {
+    farm::run();
+
     let network = Network::parse_json(NETWORK_JSON).unwrap();
 
     let input = vec![1.0, 1.0];

@@ -24,7 +24,7 @@ use crate::{
 /// let genome = layer::Genome { neurons: neurons.clone() };
 /// assert_eq!(genome.neurons, neurons);
 /// ```
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Genome {
     pub neurons: Gene,
 }
@@ -123,3 +123,60 @@ impl Target for Genome {
 }
 
 pub type Gene = Vec<neuron::Genome>;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::genome::activator;
+
+    #[test]
+    fn test_serialize() {
+        let genome = Genome {
+            neurons: vec![neuron::Genome {
+                activator: activator::Genome {
+                    activator: activator::Gene::Linear,
+                },
+                weights: vec![0.0, 1.0, 2.0],
+                bias: 3.0,
+            }],
+        };
+
+        let serialized = r#"{"neurons":[{"activator":{"activator":"Linear"},"weights":[0.0,1.0,2.0],"bias":3.0}]}"#;
+
+        assert_eq!(serde_json::to_string(&genome).unwrap(), serialized);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let genome = Genome {
+            neurons: vec![neuron::Genome {
+                activator: activator::Genome {
+                    activator: activator::Gene::Linear,
+                },
+                weights: vec![0.0, 1.0, 2.0],
+                bias: 3.0,
+            }],
+        };
+
+        let deserialized: Genome = serde_json::from_str(
+            r#"{
+                "neurons": [
+                    {
+                        "activator": {
+                            "activator": "Linear"
+                        },
+                        "weights": [
+                            0.0,
+                            1.0,
+                            2.0
+                        ],
+                        "bias": 3.0
+                    }
+                ]
+            }"#,
+        )
+        .unwrap();
+
+        assert_eq!(genome, deserialized);
+    }
+}

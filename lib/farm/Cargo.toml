@@ -9,3 +9,11 @@ edition = "2021"
 evo = { path = "../evo" }
 nnet = { path = "../nnet" }
 rand = "0.8"
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]
+
+[dependencies.serde_json]
+version = "1.0"
+features = ["preserve_order"]

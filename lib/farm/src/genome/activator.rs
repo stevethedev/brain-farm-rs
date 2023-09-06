@@ -11,7 +11,7 @@ use rand::distributions::{Distribution, Standard};
 ///
 /// let gene = Gene::Linear;
 /// ```
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Genome {
     pub activator: Gene,
 }
@@ -105,7 +105,7 @@ impl Crossover for Genome {
 }
 
 /// The gene for an activation function.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum Gene {
     /// Linear activation function.
     Linear,
@@ -173,5 +173,30 @@ impl Target for Gene {
         }
 
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_serialize() {
+        let genome = Genome {
+            activator: Gene::Linear,
+        };
+
+        let serialized = serde_json::to_string(&genome).unwrap();
+        assert_eq!(serialized, r#"{"activator":"Linear"}"#);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let genome = Genome {
+            activator: Gene::Linear,
+        };
+
+        let deserialized: Genome = serde_json::from_str(r#"{"activator":"Linear"}"#).unwrap();
+        assert_eq!(deserialized, genome);
     }
 }

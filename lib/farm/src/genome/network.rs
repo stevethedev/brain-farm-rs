@@ -29,6 +29,7 @@ use crate::mutate::Target;
 /// assert_eq!(genome.layers[0].neurons.len(), 4);
 /// assert_eq!(genome.layers[0].neurons[0].weights.len(), 3);
 /// ```
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Genome {
     pub layers: Vec<layer::Genome>,
 }
@@ -131,5 +132,42 @@ impl Target for Genome {
         self.layers = self.layers.mutate(mutator);
         // TODO: mutate the network layer vector.
         self
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_serialize() {
+        let genome = Genome {
+            layers: vec![layer::Genome { neurons: vec![] }],
+        };
+
+        let serialized = serde_json::to_string(&genome).unwrap();
+        let expected = r#"{"layers":[{"neurons":[]}]}"#;
+
+        assert_eq!(serialized, expected);
+    }
+
+    #[test]
+    fn test_deserialize() {
+        let genome = Genome {
+            layers: vec![layer::Genome { neurons: vec![] }],
+        };
+
+        let serialized = r#"
+            {
+                "layers": [
+                    {
+                        "neurons": []
+                    }
+                ]
+            }
+        "#;
+        let deserialized: Genome = serde_json::from_str(&serialized).unwrap();
+
+        assert_eq!(genome, deserialized);
     }
 }
