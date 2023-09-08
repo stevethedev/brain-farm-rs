@@ -31,7 +31,27 @@ impl super::Generate<()> for Genome {
     ///
     /// let genome = Genome::generate(());
     /// ```
-    fn generate(_: ()) -> Self {
+    fn generate(empty: ()) -> Self {
+        Self::generate(&empty)
+    }
+}
+
+impl super::Generate<&()> for Genome {
+    /// Create a new genome with a random activation function.
+    ///
+    /// # Returns
+    ///
+    /// The new genome.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::activator::Genome;
+    /// use farm::genome::Generate;
+    ///
+    /// let genome = Genome::generate(&());
+    /// ```
+    fn generate(_: &()) -> Self {
         Self::generate(rand::random::<Gene>)
     }
 }

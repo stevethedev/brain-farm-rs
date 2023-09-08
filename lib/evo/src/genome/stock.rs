@@ -10,19 +10,15 @@
 ///     value: f64,
 /// }
 ///
-/// struct Stocker;
+/// struct Stocker(Genome);
 ///
 /// impl Stock<Genome> for Stocker {
-///     fn base_genome(&self) -> Genome {
-///         Genome { value: 1.0 }
-///     }
-///
-///     fn generate(&self, base: &Genome) -> Genome {
-///         Genome { value: base.value * 2.0 }
+///     fn generate(&self) -> Genome {
+///         Genome { value: self.0.value * 2.0 }
 ///     }
 /// }
 ///
-/// let stocker = Stocker;
+/// let stocker = Stocker(Genome { value: 1.0 });
 /// let generation = stocker.stock(3);
 /// let expected = vec![
 ///     Genome { value: 2.0 },
@@ -33,16 +29,12 @@
 /// assert_eq!(generation, expected);
 /// ```
 pub trait Stock<TGenome> {
-    fn base_genome(&self) -> TGenome;
-
-    fn generate(&self, base: &TGenome) -> TGenome;
+    fn generate(&self) -> TGenome;
 
     fn stock(&self, generation_size: usize) -> super::Generation<TGenome> {
-        let base = self.base_genome();
-        let mut output = vec![];
-        let iter = std::iter::repeat_with(|| self.generate(&base));
-        output.extend(iter.take(generation_size));
-        output
+        std::iter::repeat_with(|| self.generate())
+            .take(generation_size)
+            .collect()
     }
 }
 
@@ -67,14 +59,8 @@ mod tests {
     struct Stocker;
 
     impl Stock<Genome> for Stocker {
-        fn base_genome(&self) -> Genome {
-            Genome { value: 1.0 }
-        }
-
-        fn generate(&self, base: &Genome) -> Genome {
-            Genome {
-                value: base.value * 2.0,
-            }
+        fn generate(&self) -> Genome {
+            Genome { value: 2.0 }
         }
     }
 }

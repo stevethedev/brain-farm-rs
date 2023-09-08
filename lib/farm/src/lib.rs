@@ -1,6 +1,10 @@
 pub mod breed;
 pub mod genome;
 pub mod mutate;
+pub mod stock;
+
+use crate::stock::Stock;
+use evo::Breed;
 
 pub fn run() {
     use genome::Generate;
@@ -30,8 +34,16 @@ pub fn run() {
                 .collect()
         },
     };
+    let network_stocker = stock::Stocker::<_, genome::network::Genome>::new(network_config);
 
-    let genome = genome::network::Genome::generate(&network_config);
+    let mutator = mutate::Mutator::builder()
+        .mutation_size(0.015)
+        .mutation_rate(0.15)
+        .build();
+    let breeder = breed::Breeder::new(mutator);
+
+    let genome = network_stocker.generate();
+    let genome = breeder.mutate(genome);
 
     println!("{:?}", genome);
 }
