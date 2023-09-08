@@ -3,6 +3,7 @@ pub mod genome;
 pub mod mutate;
 pub mod stock;
 
+use crate::genome::Create;
 use crate::stock::Stock;
 use evo::Breed;
 
@@ -44,6 +45,11 @@ pub fn run() {
 
     let genome = network_stocker.generate();
     let genome = breeder.mutate(genome);
+    let network = genome.create();
 
     println!("{:?}", genome);
+    println!("{:?}", network);
+
+    let output = network.activate(&[1.0, 2.0, 3.0, 4.0]);
+    println!("{:?}", output);
 }

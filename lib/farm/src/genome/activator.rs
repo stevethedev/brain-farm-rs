@@ -1,5 +1,7 @@
 use super::Crossover;
+use crate::genome::Create;
 use crate::mutate::{Mutator, Target};
+use nnet::ActivationFunction;
 use rand::distributions::{Distribution, Standard};
 
 /// The gene for an activation function.
@@ -120,6 +122,20 @@ impl Crossover for Genome {
     fn crossover(&self, other: &Self) -> Self {
         Self {
             activator: self.activator.crossover(&other.activator),
+        }
+    }
+}
+
+/// Enable creation for [`Genome`].
+///
+/// # Examples
+///
+///
+impl Create<ActivationFunction> for Genome {
+    fn create(&self) -> ActivationFunction {
+        match self.activator {
+            Gene::Linear => ActivationFunction::linear(),
+            Gene::Sigmoid => ActivationFunction::sigmoid(),
         }
     }
 }

@@ -1,6 +1,7 @@
 use super::activator;
-use crate::genome::{Crossover, Generate};
+use crate::genome::{Create, Crossover, Generate};
 use crate::mutate::{Mutator, Target, VecMutation};
+use nnet::Neuron;
 
 /// Genome for a neuron.
 ///
@@ -168,6 +169,31 @@ fn mutate_weights(weights: &mut Vec<Gene>) {
             }
         }
     };
+}
+
+impl Create<Neuron> for Genome {
+    /// Create a neuron from the genome.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::{neuron::Genome, activator};
+    /// use farm::genome::Create;
+    ///
+    /// let activator = activator::Genome { activator: activator::Gene::Linear };
+    /// let weights = vec![0.0, 1.0, 2.0];
+    /// let bias = 3.0;
+    /// let genome = Genome { activator: activator.clone(), weights: weights.clone(), bias };
+    /// let neuron = genome.create();
+    /// ```
+    fn create(&self) -> Neuron {
+        Neuron::basic()
+            .activation(self.activator.create())
+            .weights(self.weights.clone())
+            .bias(self.bias)
+            .build()
+            .into()
+    }
 }
 
 pub type Gene = f64;

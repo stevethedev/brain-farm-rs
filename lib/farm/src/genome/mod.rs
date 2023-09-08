@@ -51,6 +51,31 @@ impl Generate<std::ops::RangeInclusive<f64>> for f64 {
     }
 }
 
+/// Use a genome to create a new entity.
+///
+/// # Examples
+///
+/// ```
+/// use farm::genome::Create;
+///
+/// struct Entity {
+///    value: f64,
+/// }
+///
+/// impl Create<Entity> for f64 {
+///     fn create(&self) -> Entity {
+///         Entity { value: *self }
+///     }
+/// }
+///
+/// let entity = 1.0.create();
+///
+/// assert_eq!(entity.value, 1.0);
+/// ```
+pub trait Create<TEntity> {
+    fn create(&self) -> TEntity;
+}
+
 /// Enable crossover for a gene or genome.
 pub trait Crossover {
     /// Crossover the target.

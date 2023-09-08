@@ -1,9 +1,10 @@
 use super::neuron;
-use crate::genome::Generate;
+use crate::genome::{Create, Generate};
 use crate::{
     genome::Crossover,
     mutate::{Mutator, Target},
 };
+use nnet::Layer;
 
 /// Genome for a layer.
 ///
@@ -119,6 +120,32 @@ impl Target for Genome {
         self.neurons = mutator.mutate(self.neurons);
         // TODO: Support structural mutations on the neurons.
         self
+    }
+}
+
+impl Create<Layer> for Genome {
+    /// Create a new layer from the genome.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::{layer::Genome, neuron, activator};
+    /// use farm::genome::Create;
+    ///
+    /// let neurons = vec![
+    ///     neuron::Genome {
+    ///         activator: activator::Genome { activator: activator::Gene::Linear },
+    ///         weights: vec![0.0, 1.0, 2.0],
+    ///         bias: 3.0,
+    ///     },
+    /// ];
+    /// let genome = Genome { neurons };
+    /// let layer = genome.create();
+    /// ```
+    fn create(&self) -> Layer {
+        Layer::builder()
+            .neurons(self.neurons.iter().map(neuron::Genome::create).collect())
+            .build()
     }
 }
 

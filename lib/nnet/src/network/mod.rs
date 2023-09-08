@@ -228,6 +228,33 @@ impl Builder {
         self
     }
 
+    /// Set the layers for the network.
+    ///
+    /// # Arguments
+    ///
+    /// - `layers` to set for the network.
+    ///
+    /// # Returns
+    ///
+    /// The builder.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Network, Layer, BasicNeuron};
+    ///
+    /// let neuron = BasicNeuron::builder().build();
+    /// let layer = Layer::builder().add_neuron(neuron).build();
+    /// let network = Network::builder().layers(vec![layer]).build();
+    ///
+    /// assert_eq!(network.layers().len(), 1);
+    /// ```
+    #[must_use]
+    pub fn layers(mut self, layers: Vec<Layer>) -> Self {
+        self.layers = layers;
+        self
+    }
+
     /// Build the network.
     ///
     /// # Returns
