@@ -22,6 +22,7 @@ pub trait Target {
     /// # Returns
     ///
     /// The mutated target.
+    #[must_use]
     fn mutate(self, mutator: &super::Mutator) -> Self;
 }
 

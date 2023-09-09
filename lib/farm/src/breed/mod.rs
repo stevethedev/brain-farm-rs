@@ -37,6 +37,7 @@ impl Breeder {
     /// # Returns
     ///
     /// The new breeder.
+    #[must_use]
     pub fn new(mutator: Mutator) -> Self {
         Self { mutator }
     }

@@ -113,6 +113,7 @@ pub trait Crossover {
     /// # Returns
     ///
     /// The crossovered target.
+    #[must_use]
     fn crossover(&self, other: &Self) -> Self;
 }
 
@@ -144,7 +145,7 @@ impl Crossover for f64 {
 
         let (min, max) = (a.min(b), a.max(b));
 
-        if min == max {
+        if f64::abs(max - min) < f64::EPSILON {
             min
         } else {
             thread_rng().gen_range(min..=max)

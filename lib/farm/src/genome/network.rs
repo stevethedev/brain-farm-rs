@@ -162,7 +162,7 @@ impl Create<Network> for Genome {
     /// let network = genome.create();
     /// ```
     fn create(&self) -> Network {
-        let layers = self.layers.iter().map(|layer| layer.create()).collect();
+        let layers = self.layers.iter().map(layer::Genome::create).collect();
         Network::builder().layers(layers).build()
     }
 }

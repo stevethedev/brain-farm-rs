@@ -1,3 +1,12 @@
+#![deny(
+    clippy::complexity,
+    clippy::correctness,
+    clippy::perf,
+    clippy::style,
+    clippy::suspicious,
+    clippy::pedantic
+)]
+
 pub mod breed;
 pub mod genome;
 pub mod mutate;

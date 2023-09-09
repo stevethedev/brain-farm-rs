@@ -28,6 +28,7 @@ impl Mutator {
     ///
     /// let mutator = Mutator::builder().build();
     /// ```
+    #[must_use]
     pub fn builder() -> Builder {
         Builder::default()
     }
@@ -47,6 +48,7 @@ impl Mutator {
     ///
     /// let should_mutate = mutator.check_mutate();
     /// ```
+    #[must_use]
     pub fn check_mutate(&self) -> bool {
         thread_rng().gen_range(0.0..1.0) < self.mutation_rate
     }
@@ -66,6 +68,7 @@ impl Mutator {
     ///
     /// let mutation_degree = mutator.mutation_size();
     /// ```
+    #[must_use]
     pub fn mutation_size(&self) -> f64 {
         self.mutation_size * thread_rng().gen_range(-1.0..1.0)
     }
@@ -139,6 +142,7 @@ impl Builder {
     ///
     /// let mutator = Builder::default().mutation_rate(0.15).build();
     /// ```
+    #[must_use]
     pub fn mutation_rate(mut self, mutation_rate: f64) -> Self {
         self.mutation_rate = mutation_rate;
         self
@@ -161,6 +165,7 @@ impl Builder {
     ///
     /// let mutator = Builder::default().mutation_size(0.15).build();
     /// ```
+    #[must_use]
     pub fn mutation_size(mut self, mutation_size: f64) -> Self {
         self.mutation_size = mutation_size;
         self
@@ -179,6 +184,7 @@ impl Builder {
     ///
     /// let mutator = Builder::default().build();
     /// ```
+    #[must_use]
     pub fn build(self) -> Mutator {
         Mutator {
             mutation_rate: self.mutation_rate,
