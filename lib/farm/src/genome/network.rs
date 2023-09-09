@@ -1,5 +1,5 @@
 use super::layer;
-use crate::genome::{Create, Crossover, Generate};
+use crate::genome::{Create, Crossover, Extract, Generate};
 use crate::mutate::Target;
 use nnet::Network;
 
@@ -167,6 +167,43 @@ impl Create<Network> for Genome {
     }
 }
 
+impl Extract<Genome> for Network {
+    /// Extract a [`Genome`] from the [`Network`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::{network, layer, neuron, activator, Generate, Extract, Create};
+    ///
+    /// let neuron_config = neuron::GenerateConfig {
+    ///     activator_generator: || activator::Genome::generate(()),
+    ///     weight_generator: || std::iter::from_fn(|| Some(f64::generate(-1.0..=1.0))).take(3).collect(),
+    ///     bias_generator: || f64::generate(-2.0..=2.0),
+    /// };
+    ///
+    /// let layer_config = layer::GenerateConfig {
+    ///     neuron_generator: || std::iter::from_fn(|| Some(neuron::Genome::generate(&neuron_config))).take(5).collect(),
+    /// };
+    ///
+    /// let network_config = network::GenerateConfig {
+    ///     layer_generator: || std::iter::from_fn(|| Some(layer::Genome::generate(&layer_config))).take(5).collect(),
+    /// };
+    ///
+    /// let genome = network::Genome::generate(&network_config);
+    /// let network = genome.create();
+    ///
+    /// let genome = network.genome();
+    ///
+    /// assert_eq!(genome.layers.len(), 5);
+    /// assert_eq!(genome.layers[0].neurons.len(), 5);
+    /// assert_eq!(genome.layers[0].neurons[0].weights.len(), 3);
+    /// ```
+    fn genome(&self) -> Genome {
+        let layers = self.layers().iter().map(nnet::Layer::genome).collect();
+        Genome { layers }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -198,7 +235,7 @@ mod tests {
                 ]
             }
         "#;
-        let deserialized: Genome = serde_json::from_str(&serialized).unwrap();
+        let deserialized: Genome = serde_json::from_str(serialized).unwrap();
 
         assert_eq!(genome, deserialized);
     }

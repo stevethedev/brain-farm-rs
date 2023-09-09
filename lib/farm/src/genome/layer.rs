@@ -1,5 +1,5 @@
 use super::neuron;
-use crate::genome::{Create, Generate};
+use crate::genome::{Create, Extract, Generate};
 use crate::{
     genome::Crossover,
     mutate::{Mutator, Target},
@@ -146,6 +146,37 @@ impl Create<Layer> for Genome {
         Layer::builder()
             .neurons(self.neurons.iter().map(neuron::Genome::create).collect())
             .build()
+    }
+}
+
+impl Extract<Genome> for Layer {
+    /// Extract a genome from a layer.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::{layer::Genome, neuron, activator, Create};
+    /// use farm::genome::Extract;
+    /// use nnet::Layer;
+    ///
+    /// let neurons = vec![
+    ///     neuron::Genome {
+    ///         activator: activator::Genome { activator: activator::Gene::Linear },
+    ///         weights: vec![0.0, 1.0, 2.0],
+    ///         bias: 3.0,
+    ///     },
+    /// ];
+    /// let layer = Layer::builder()
+    ///     .neurons(neurons.iter().map(neuron::Genome::create).collect())
+    ///     .build();
+    /// let genome = layer.genome();
+    ///
+    /// assert_eq!(genome.neurons.len(), 1);
+    /// assert_eq!(genome.neurons[0].weights.len(), 3);
+    /// ```
+    fn genome(&self) -> Genome {
+        let neurons = self.neurons().iter().map(nnet::Neuron::genome).collect();
+        Genome { neurons }
     }
 }
 

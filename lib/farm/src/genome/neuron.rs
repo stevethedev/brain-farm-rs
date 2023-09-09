@@ -1,5 +1,5 @@
 use super::activator;
-use crate::genome::{Create, Crossover, Generate};
+use crate::genome::{Create, Crossover, Extract, Generate};
 use crate::mutate::{Mutator, Target, VecMutation};
 use nnet::Neuron;
 
@@ -196,6 +196,43 @@ impl Create<Neuron> for Genome {
     }
 }
 
+impl Extract<Genome> for Neuron {
+    /// Extract the genome from a neuron.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use farm::genome::{neuron::Genome, activator, Create};
+    /// use farm::genome::Extract;
+    /// use nnet::Neuron;
+    ///
+    /// let activator = activator::Genome { activator: activator::Gene::Linear };
+    /// let weights = vec![0.0, 1.0, 2.0];
+    /// let bias = 3.0;
+    /// let neuron: Neuron = Neuron::basic()
+    ///     .activation(activator.create())
+    ///     .weights(weights.clone())
+    ///     .bias(bias)
+    ///     .build()
+    ///     .into();
+    /// let genome = neuron.genome();
+    /// assert_eq!(genome.activator, activator);
+    /// assert_eq!(genome.weights, weights);
+    /// assert_eq!(genome.bias, bias);
+    /// ```
+    fn genome(&self) -> Genome {
+        let activator = self.activator().genome();
+        let weights = self.weights().to_vec();
+        let bias = self.bias();
+
+        Genome {
+            activator,
+            weights,
+            bias,
+        }
+    }
+}
+
 pub type Gene = f64;
 
 #[cfg(test)]
@@ -245,7 +282,7 @@ mod tests {
                 "bias": 3.0
             }
         "#;
-        let deserialized: Genome = serde_json::from_str(&serialized).unwrap();
+        let deserialized: Genome = serde_json::from_str(serialized).unwrap();
 
         assert_eq!(deserialized, genome);
     }

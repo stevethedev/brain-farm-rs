@@ -76,6 +76,32 @@ pub trait Create<TEntity> {
     fn create(&self) -> TEntity;
 }
 
+/// Extract the genome from an entity.
+///
+/// # Examples
+///
+/// ```
+/// use farm::genome::Extract;
+///
+/// struct Entity {
+///     value: f64,
+/// }
+///
+/// impl Extract<f64> for Entity {
+///     fn genome(&self) -> f64 {
+///         self.value
+///     }
+/// }
+///
+/// let entity = Entity { value: 1.0 };
+/// let genome = entity.genome();
+///
+/// assert_eq!(genome, 1.0);
+/// ```
+pub trait Extract<TEntity> {
+    fn genome(&self) -> TEntity;
+}
+
 /// Enable crossover for a gene or genome.
 pub trait Crossover {
     /// Crossover the target.

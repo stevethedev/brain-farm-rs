@@ -36,6 +36,78 @@ impl Basic {
     pub fn builder() -> Builder {
         Builder::default()
     }
+
+    /// Get the neuron's activation function.
+    ///
+    /// # Returns
+    ///
+    /// The activation function.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Neuron, BasicNeuron, ActivationFunction};
+    ///
+    /// let neuron = BasicNeuron::builder()
+    ///     .bias(0.0)
+    ///     .weights(vec![0.1, 0.2, 0.3, 0.4])
+    ///     .activation(ActivationFunction::linear())
+    ///     .build();
+    ///
+    /// assert_eq!(neuron.activation(), &ActivationFunction::linear());
+    /// ```
+    #[must_use]
+    pub fn activation(&self) -> &ActivationFunction {
+        &self.activation
+    }
+
+    /// Get the neuron's bias.
+    ///
+    /// # Returns
+    ///
+    /// The bias.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Neuron, BasicNeuron, ActivationFunction};
+    ///
+    /// let neuron = BasicNeuron::builder()
+    ///     .bias(0.0)
+    ///     .weights(vec![0.1, 0.2, 0.3, 0.4])
+    ///     .activation(ActivationFunction::linear())
+    ///     .build();
+    ///
+    /// assert_eq!(neuron.bias(), 0.0);
+    /// ```
+    #[must_use]
+    pub fn bias(&self) -> f64 {
+        self.bias
+    }
+
+    /// Get the neuron's weights.
+    ///
+    /// # Returns
+    ///
+    /// The weights.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use nnet::{Neuron, BasicNeuron, ActivationFunction};
+    ///
+    /// let neuron = BasicNeuron::builder()
+    ///     .bias(0.0)
+    ///     .weights(vec![0.1, 0.2, 0.3, 0.4])
+    ///     .activation(ActivationFunction::linear())
+    ///     .build();
+    ///
+    /// assert_eq!(neuron.weights(), &[0.1, 0.2, 0.3, 0.4]);
+    /// ```
+    #[must_use]
+    pub fn weights(&self) -> &[f64] {
+        &self.weights
+    }
 }
 
 impl Neuron {

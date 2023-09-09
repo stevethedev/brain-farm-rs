@@ -1,5 +1,5 @@
 use super::Crossover;
-use crate::genome::Create;
+use crate::genome::{Create, Extract};
 use crate::mutate::{Mutator, Target};
 use nnet::ActivationFunction;
 use rand::distributions::{Distribution, Standard};
@@ -130,13 +130,44 @@ impl Crossover for Genome {
 ///
 /// # Examples
 ///
+/// ```
+/// use farm::genome::{activator::{Genome, Gene}, Create};
+/// use nnet::ActivationFunction;
 ///
+/// let genome = Genome { activator: Gene::Linear };
+/// let activator = genome.create();
+///
+/// assert_eq!(activator, ActivationFunction::linear());
+/// ```
 impl Create<ActivationFunction> for Genome {
     fn create(&self) -> ActivationFunction {
         match self.activator {
             Gene::Linear => ActivationFunction::linear(),
             Gene::Sigmoid => ActivationFunction::sigmoid(),
         }
+    }
+}
+
+/// Enable extraction for [`Genome`].
+///
+/// # Examples
+///
+/// ```
+/// use farm::genome::{activator::{Genome, Gene}, Extract};
+/// use nnet::ActivationFunction;
+///
+/// let genome = ActivationFunction::linear().genome();
+///
+/// assert_eq!(genome, Genome { activator: Gene::Linear });
+/// ```
+impl Extract<Genome> for ActivationFunction {
+    fn genome(&self) -> Genome {
+        let activator = match self {
+            Self::Linear(_) => Gene::Linear,
+            Self::Sigmoid(_) => Gene::Sigmoid,
+        };
+
+        Genome { activator }
     }
 }
 
